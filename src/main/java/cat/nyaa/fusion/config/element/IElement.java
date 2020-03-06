@@ -1,14 +1,16 @@
 package cat.nyaa.fusion.config.element;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.nyaacore.configuration.ISerializable;
 import org.bukkit.inventory.ItemStack;
+import think.rpgitems.power.PropertyHolder;
 
 import java.util.List;
 
-public interface IElement extends ISerializable {
+public interface IElement extends PropertyHolder {
     boolean match(ItemStack itemStack);
     ItemStack getItemStack();
+    String getID();
+    String getName();
 
     List<IRecipe> getRecipes();
 }

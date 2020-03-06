@@ -1,14 +1,11 @@
 package cat.nyaa.fusion.inst.element;
 
 import cat.nyaa.fusion.config.element.IElement;
-import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.nyaacore.configuration.ISerializable;
 import org.bukkit.inventory.ItemStack;
 import think.rpgitems.item.ItemManager;
 import think.rpgitems.item.RPGItem;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Optional;
 
 public class RPGItemElement implements IElement {
