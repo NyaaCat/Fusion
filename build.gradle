@@ -1,0 +1,31 @@
+plugins {
+    id 'java-library'
+}
+
+ext.minecraftVersion = "1.15.2"
+
+String majorVersion = 1
+String minorVersion = 0
+
+String buildNumber = System.getenv("BUILD_NUMBER") == null ? "0"             : System.getenv("BUILD_NUMBER")
+
+version = "$majorVersion.$minorVersion-$buildNumber"
+
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { name 'Spigot'; url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { name 'Sonatype'; url 'https://oss.sonatype.org/content/groups/public' }
+    maven { name 'sk89q'; url 'http://maven.sk89q.com/artifactory/repo/' }
+    maven { name 'vault-repo'; url 'https://jitpack.io' }
+    maven { name 'NyaaCat'; url 'https://ci.nyaacat.com/maven/' }
+    maven { name 'EssentialsX'; url 'https://ci.ender.zone/plugin/repository/everything' }
+    maven { name 'aikar';     url 'https://repo.aikar.co/content/groups/aikar/' }
+}
+
+dependencies {
+    api "org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT"
+    api "cat.nyaa:nyaacore:7.1-SNAPSHOT"
+    api "cat.nyaa:rpgitems:3.8-SNAPSHOT"
+}

@@ -1,0 +1,21 @@
+name: Fusion
+main: cat.nyaa.fusion.FusionPlugin
+description: "FusionPlugin"
+version: ${version}
+depend: [NyaaCore,LangUtils]
+authors: [ReinWD]
+website: "https://github.com/NyaaCat/Fusion"
+database: false
+api-version: 1.13
+
+commands:
+  fusion:
+    description: 'fusion plugin admin command'
+    permission: fusion.admin
+    permission-message: "You do not have the required permission: <permission>"
+    usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
+
+permissions:
+  fusion.admin:
+    default: op
+    description: 'admin permission for fusion plugin'
