@@ -1,7 +1,11 @@
 package cat.nyaa.fusion;
 
+import cat.nyaa.fusion.ui.impl.CraftingTableAccess;
 import cat.nyaa.nyaacore.ILocalizer;
+import cat.nyaa.nyaacore.cmdreceiver.Arguments;
 import cat.nyaa.nyaacore.cmdreceiver.CommandReceiver;
+import cat.nyaa.nyaacore.cmdreceiver.SubCommand;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class AdminCommands extends CommandReceiver {
@@ -22,5 +26,9 @@ public class AdminCommands extends CommandReceiver {
     @Override
     public String getHelpPrefix() {
         return "fusion";
+    }
+
+    @SubCommand(value = "craft", permission = "fusion.user")
+    public void onCraft(CommandSender sender, Arguments arguments){
     }
 }

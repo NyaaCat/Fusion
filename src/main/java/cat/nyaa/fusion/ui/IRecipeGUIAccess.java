@@ -1,4 +1,4 @@
-package cat.nyaa.fusion.inst;
+package cat.nyaa.fusion.ui;
 
 import cat.nyaa.fusion.config.element.IElement;
 
@@ -14,4 +14,6 @@ public interface IRecipeGUIAccess {
     IElement getItemAt(int index);
 
     void setResultItem(IElement item);
+
+    boolean isValidClick(int rawSlot);
 }

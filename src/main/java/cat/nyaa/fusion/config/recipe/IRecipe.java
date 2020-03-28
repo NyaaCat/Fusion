@@ -1,16 +1,15 @@
 package cat.nyaa.fusion.config.recipe;
 
 import cat.nyaa.fusion.config.element.IElement;
-import cat.nyaa.fusion.inst.IRecipeGUIAccess;
-import think.rpgitems.power.PropertyHolder;
+import cat.nyaa.fusion.ui.IRecipeGUIAccess;
+import cat.nyaa.nyaacore.configuration.ISerializable;
 
 import java.util.List;
 
-public interface IRecipe extends PropertyHolder {
+public interface IRecipe extends ISerializable {
     IElement getResultItem();
     List<IElement> getRawRecipe();
     int getElementCount();
-    String getId();
     String getName();
 
     default void updateGUI(IRecipeGUIAccess guiAccess){

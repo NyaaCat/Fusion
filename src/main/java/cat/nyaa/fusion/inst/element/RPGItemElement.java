@@ -1,6 +1,5 @@
 package cat.nyaa.fusion.inst.element;
 
-import cat.nyaa.fusion.config.element.IElement;
 import org.bukkit.inventory.ItemStack;
 import think.rpgitems.item.ItemManager;
 import think.rpgitems.item.RPGItem;
@@ -8,11 +7,12 @@ import think.rpgitems.item.RPGItem;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-public class RPGItemElement implements IElement {
+public class RPGItemElement extends BaseElement {
     private RPGItem elementRgi;
     private WeakReference<ItemStack> itemReference;
 
-    public RPGItemElement(RPGItem elementRgi) {
+    public RPGItemElement(String name, RPGItem elementRgi) {
+        super(name);
         this.elementRgi = elementRgi;
     }
 

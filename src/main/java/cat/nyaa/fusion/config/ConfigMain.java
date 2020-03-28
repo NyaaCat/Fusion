@@ -10,6 +10,9 @@ import java.util.List;
 
 public class ConfigMain extends PluginConfigure {
     @Serializable
+    public String language = "en_US";
+
+    @Serializable
     public boolean enabled = true;
 
     @Serializable(name = "gui.shortcut.enabled")

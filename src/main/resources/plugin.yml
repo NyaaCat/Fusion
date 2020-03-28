@@ -10,12 +10,24 @@ api-version: 1.13
 
 commands:
   fusion:
+    aliases: fus
     description: 'fusion plugin admin command'
     permission: fusion.admin
     permission-message: "You do not have the required permission: <permission>"
     usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
+  fusion_debug:
+    description: 'debug command for fusion'
+    permission: fusion.admin
+    aliases:
+      - fusd
+    permission-message: "You do not have the required permission: <permission>"
+    usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
+
 
 permissions:
   fusion.admin:
     default: op
     description: 'admin permission for fusion plugin'
+  fusion.user:
+    default: true
+    description: 'user permission for fusion plugin'
