@@ -3,13 +3,15 @@ package cat.nyaa.fusion.ui.impl;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
+import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.IRecipeGUIAccess;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
 import org.bukkit.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ListRecipeAccess implements IRecipeGUIAccess {
+public class ListRecipeAccess extends BaseUi {
     private final int rows = 3;
     private final int cols = 5;
 
@@ -17,25 +19,15 @@ public class ListRecipeAccess implements IRecipeGUIAccess {
     private final Inventory inventory;
     private final List<IRecipe> recipes;
 
-    ListRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipe){
+    public ListRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipe){
+        super(sectionIndexes, inventory);
         this.matrixCoordinate = new MatrixCoordinate(sectionIndexes, 3, 6);
         this.inventory = inventory;
         this.recipes = recipe;
     }
 
     @Override
-    public void setContent(List<IElement> rawRecipe, IElement resultItem) {
-        setContent(rawRecipe);
-    }
-
-    @Override
-    public void setContent(List<IElement> rawRecipe) {
-
-    }
-
-    @Override
-    public void setItemAt(int row, int col, IElement itemStack) {
-        inventory.setItem(matrixCoordinate.access(row, col), itemStack.getItemStack());
+    protected void addSplitters() {
     }
 
     @Override
@@ -51,11 +43,6 @@ public class ListRecipeAccess implements IRecipeGUIAccess {
     @Override
     public IElement getItemAt(int index) {
         return getItemAt(index / 5, index % 5);
-    }
-
-    @Override
-    public void setResultItem(IElement item) {
-
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.List;
 public interface IRecipeGUIAccess {
     void setContent(List<IElement> rawRecipe, IElement resultItem);
     void setContent(List<IElement> rawRecipe);
+    List<IElement> getContent();
 
     void setItemAt(int row, int col, IElement itemStack);
     void setItemAt(int index, IElement itemStack);

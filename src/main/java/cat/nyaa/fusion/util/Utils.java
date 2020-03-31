@@ -2,16 +2,20 @@ package cat.nyaa.fusion.util;
 
 import cat.nyaa.fusion.FusionPlugin;
 import cat.nyaa.fusion.I18n;
+import cat.nyaa.nyaacore.utils.ItemTagUtils;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class Utils {
     private static TaskChainFactory factory;
@@ -42,6 +46,22 @@ public class Utils {
             });
         }
         fakeItem.setItemMeta(fakeMeta);
+        try {
+            ItemTagUtils.setInt(fakeItem, "fusion_model", 1);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "exception creating model");
+            e.printStackTrace();
+        }
         return fakeItem;
+    }
+
+    public static List<Integer> getGuiSection(int row, int index, int rows, int cols) {
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                indexes.add((i + row) * 9 + index + j);
+            }
+        }
+        return indexes;
     }
 }

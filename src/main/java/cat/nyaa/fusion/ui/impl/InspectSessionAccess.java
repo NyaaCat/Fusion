@@ -5,7 +5,6 @@ import cat.nyaa.fusion.I18n;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
-import cat.nyaa.fusion.inst.element.BaseElement;
 import cat.nyaa.fusion.ui.IQueryUiAccess;
 import cat.nyaa.fusion.ui.IRecipeGUIAccess;
 import cat.nyaa.fusion.ui.UiType;
@@ -13,8 +12,6 @@ import cat.nyaa.fusion.ui.buttons.GUIButton;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,29 +19,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 import static cat.nyaa.fusion.util.Utils.getFakeItem;
+import static cat.nyaa.fusion.util.Utils.getGuiSection;
 
 public class InspectSessionAccess implements IQueryUiAccess {
-
-    private static List<Integer> gui_startFrom(int row, int index, int rows, int cols) {
-        List<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                indexes.add((i + row) * 9 + index + j);
-            }
-        }
-        return indexes;
-    }
 
     private static BiMap<Inventory, InspectSessionAccess> trackedInventory = HashBiMap.create();
     private static Map<Integer, GUIButton> buttons = new HashMap<>();
     private static IRecipeGUIAccess recipeGui;
-    private static List<Integer> recipeSpace = gui_startFrom(0, 2, 3, 5);
+    private static List<Integer> recipeSpace = getGuiSection(0, 2, 3, 5);
 
     Inventory largeChestInventory;
     private Player player;
@@ -108,6 +94,8 @@ public class InspectSessionAccess implements IQueryUiAccess {
             case DETAILED:
                 recipeGui = new DetailRecipeAccess(recipeSpace, largeChestInventory, recipes.get(page));
                 break;
+            case CRAFTING:
+                recipeGui = new CraftingTableAccess(recipeSpace, largeChestInventory);
         }
     }
 
@@ -164,7 +152,7 @@ public class InspectSessionAccess implements IQueryUiAccess {
     private static boolean registered = false;
 
     public void ensureInventory(){
-        if (largeChestInventory == null || largeChestInventory.getType().equals(InventoryType.CHEST) || largeChestInventory.getSize() < 54){
+        if (largeChestInventory == null || largeChestInventory.getType().equals(InventoryType.CHEST) || largeChestInventory.getSize() != 27){
             largeChestInventory = Bukkit.createInventory(player, 27, I18n.format("inventory.title", this.getCurrentPage(), this.getSize()));
             if (trackedInventory.containsValue(this)){
                 trackedInventory.forcePut(largeChestInventory, this);
@@ -172,6 +160,12 @@ public class InspectSessionAccess implements IQueryUiAccess {
             }
             trackedInventory.put(largeChestInventory, this);
         }
+    }
+
+    public void openForPlayer(Player player){
+        ensureInventory();
+        refreshUi();
+        player.openInventory(largeChestInventory);
     }
 
     @Override

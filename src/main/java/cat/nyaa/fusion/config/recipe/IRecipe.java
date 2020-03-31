@@ -12,6 +12,8 @@ public interface IRecipe extends ISerializable {
     int getElementCount();
     String getName();
 
+    boolean matches(List<IElement> matrix);
+
     default void updateGUI(IRecipeGUIAccess guiAccess){
         List<IElement> rawRecipe = getRawRecipe();
         guiAccess.setContent(rawRecipe, getResultItem());

@@ -34,9 +34,6 @@ public class NamedDirConfigs<T extends NamedFileConfig> implements ISerializable
     }
 
     public String add(String name, T config) {
-        if (configs.containsKey(name)) {
-            throw new IllegalArgumentException(name.concat(" exists"));
-        }
         configs.put(name, config);
         return name;
     }
@@ -52,6 +49,8 @@ public class NamedDirConfigs<T extends NamedFileConfig> implements ISerializable
     public Collection<T> values() {
         return configs.values();
     }
+
+    public Collection<Map.Entry<String, T>> entries(){return configs.entrySet();}
 
     public void loadFromDir() {
         this.clear();
