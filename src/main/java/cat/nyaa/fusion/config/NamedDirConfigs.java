@@ -58,16 +58,17 @@ public class NamedDirConfigs<T extends NamedFileConfig> implements ISerializable
             File[] files = storageDir.listFiles(pathname -> pathname.getName().endsWith(".yml"));
             if (files != null && files.length > 0) {
                 for (File file : files) {
+                    String fileName = file.getName();
                     try {
                         String name = file.getName().split("\\.")[0];
 
                         T t = targetClass.getConstructor(String.class).newInstance(name);
 //                            if (t.getFileName().equals(file.getName())) {
 //                                t.load();
-                        configs.put(name, t);
                         YamlConfiguration config = new YamlConfiguration();
                         config.load(file);
                         t.deserialize(config);
+                        configs.put(name, t);
 //                            }
                     } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | NumberFormatException | InvocationTargetException e) {
                         e.printStackTrace();
@@ -77,6 +78,9 @@ public class NamedDirConfigs<T extends NamedFileConfig> implements ISerializable
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (IllegalArgumentException e){
+                        IllegalArgumentException e1 = new IllegalArgumentException("error loading item in recipe " + fileName);
+                        e1.printStackTrace();
                     }
                 }
             }

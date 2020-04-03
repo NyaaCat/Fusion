@@ -99,7 +99,11 @@ public class RPGItemElement extends BaseElement {
 
     @Override
     public IElement createFromString(String serialized) {
-        String name = serialized.split(":")[1];
+        String[] split = serialized.split(":");
+        if (split.length < 2){
+            return RecipeManager.getEmptyElement();
+        }
+        String name = split[1];
         RPGItem rpgItem = ItemManager.getItem(name).orElse(null);
         if (rpgItem == null){
             return RecipeManager.getEmptyElement();

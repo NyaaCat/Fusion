@@ -3,6 +3,7 @@ main: cat.nyaa.fusion.FusionPlugin
 description: "FusionPlugin"
 version: ${version}
 depend: [NyaaCore,LangUtils]
+softdepend: [RPGItems]
 authors: [ReinWD]
 website: "https://github.com/NyaaCat/Fusion"
 database: false

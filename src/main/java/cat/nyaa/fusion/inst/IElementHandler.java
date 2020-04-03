@@ -14,7 +14,7 @@ public interface IElementHandler extends IElementHolder {
         if (s.contains(":")){
             String prefix = s.split(":")[0];
             return prefix.equals(getNamespace());
-        }else return true;
+        }else return false;
     }
 
     String getNamespace();
@@ -22,7 +22,11 @@ public interface IElementHandler extends IElementHolder {
     IElement create(ItemStack itemStack);
 
     default IElement createFromString(String serialized){
-        return RecipeManager.getItem(ItemStackUtils.itemFromBase64(serialized));
+        try {
+            return RecipeManager.getItem(ItemStackUtils.itemFromBase64(serialized));
+        }catch (Exception e){
+            throw new IllegalArgumentException("invalid item");
+        }
     }
     String serialize();
 

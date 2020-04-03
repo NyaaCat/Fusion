@@ -17,9 +17,7 @@ public class FusionPlugin extends JavaPlugin {
     public void onEnable() {
         super.onEnable();
         plugin = this;
-        configMain = new ConfigMain();
-        configMain.load();
-        i18n = new I18n(configMain.language);
+        onReload();
         debugCommand = new DebugCommand(this, i18n);
         adminCommands = new AdminCommands(this, i18n);
         events = new Events(this);
@@ -27,6 +25,14 @@ public class FusionPlugin extends JavaPlugin {
         getServer().getPluginCommand("fusion").setExecutor(adminCommands);
         getServer().getPluginManager().registerEvents(debugCommand, this);
         getServer().getPluginManager().registerEvents(events, this);
-        RecipeManager.getInstance();
+    }
+
+    public void onReload(){
+        configMain = new ConfigMain();
+        configMain.load();
+        i18n = new I18n(configMain.language);
+        i18n.load();
+        RecipeManager instance = RecipeManager.getInstance();
+        instance.loadFromDir();
     }
 }

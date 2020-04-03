@@ -71,6 +71,11 @@ public class VanillaElement extends BaseElement {
     }
 
     @Override
+    public boolean isSuitableElement(String s) {
+        return true;
+    }
+
+    @Override
     public String getNamespace() {
         return "vanilla";
     }

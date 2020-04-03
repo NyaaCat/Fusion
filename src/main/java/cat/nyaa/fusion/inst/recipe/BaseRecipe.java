@@ -7,7 +7,6 @@ import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.inst.RecipeMatchingMode;
 import cat.nyaa.fusion.inst.element.VanillaElement;
 import cat.nyaa.nyaacore.configuration.ISerializable;
-import cat.nyaa.nyaacore.utils.ItemStackUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,7 +26,7 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
     @Serializable(name = "matching_mode")
     protected RecipeMatchingMode matchingMode = RecipeMatchingMode.EXACT;
 
-    protected List<IElement> iElements = new ArrayList<>();
+    protected List<IElement> recipies = new ArrayList<>();
     protected ItemStack resultItem;
 
     public BaseRecipe(String name) {
@@ -35,12 +34,12 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
     }
 
     public void addElement(IElement element){
-        iElements.add(element);
+        recipies.add(element);
         recipiesNbt.add(element.getElementHandler().serialize());
     }
 
     public void clear(){
-        iElements.clear();
+        recipies.clear();
         resultItem = null;
         recipiesNbt.clear();
         resultItemNbt = "";
@@ -48,17 +47,22 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
 
     @Override
     public IElement getResultItem() {
-        return null;
+        return RecipeManager.getItem(resultItem);
     }
+
+    Integer count;
 
     @Override
     public List<IElement> getRawRecipe() {
-        return null;
+        return recipies;
     }
 
     @Override
     public int getElementCount() {
-        return 0;
+        if (count == null){
+            count = (int) recipies.stream().filter(element -> !element.equals(RecipeManager.getEmptyElement())).count();
+        }
+        return count;
     }
 
     @Override
@@ -68,8 +72,8 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
 
     @Override
     public boolean matches(List<IElement> matrix) {
-        for (int i = 0; i < iElements.size(); i++) {
-            IElement itemStack = iElements.get(i);
+        for (int i = 0; i < recipies.size(); i++) {
+            IElement itemStack = recipies.get(i);
             IElement item = matrix.get(i);
             if (itemStack == null) {
                 if (item != null) {
@@ -90,9 +94,9 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
         if (!recipiesNbt.isEmpty()) {
             recipiesNbt.forEach(s -> {
                 if(s.equals("")){
-                    iElements.add(VanillaElement.EMPTY_ELEMENT);
+                    recipies.add(VanillaElement.EMPTY_ELEMENT);
                 }else {
-                    iElements.add(RecipeManager.getItem(s));
+                    recipies.add(RecipeManager.getItem(s));
                 }
             });
         }
