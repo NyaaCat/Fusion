@@ -1,14 +1,14 @@
 package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.I18n;
-import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.fuser.BukkitFuser;
 import cat.nyaa.fusion.inst.RecipeManager;
-import cat.nyaa.fusion.ui.*;
+import cat.nyaa.fusion.ui.BaseUi;
+import cat.nyaa.fusion.ui.MatrixCoordinate;
+import cat.nyaa.fusion.ui.UiCoordinate;
 import cat.nyaa.fusion.util.Utils;
 import cat.nyaa.nyaacore.BasicItemMatcher;
-import co.aikar.taskchain.TaskChain;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryAction;
@@ -19,7 +19,6 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,17 +46,17 @@ public class CraftingTableAccess extends BaseUi {
 
 
     @Override
-    public void setItemAt(int index, IElement itemStack) {
+    public void setItemAt(int index, ItemStack itemStack) {
         setItemAt(index / 3, index % 3, itemStack);
     }
 
     @Override
-    public IElement getItemAt(int row, int col) {
-        return RecipeManager.getItem(inventory.getItem(matrixCoordinate.access(row, col)));
+    public ItemStack getItemAt(int row, int col) {
+        return inventory.getItem(matrixCoordinate.access(row, col));
     }
 
     @Override
-    public IElement getItemAt(int index) {
+    public ItemStack getItemAt(int index) {
         return getItemAt(index/3, index%3);
     }
 
@@ -132,7 +131,7 @@ public class CraftingTableAccess extends BaseUi {
 
     private void costItem() {
         for (int i = 0; i < 9; i++) {
-            ItemStack itemStack = getItemAt(i).getItemStack();
+            ItemStack itemStack = getItemAt(i);
             if (!itemStack.getType().isAir()) {
                 int amount = itemStack.getAmount();
                 if (amount == 1){
@@ -144,7 +143,7 @@ public class CraftingTableAccess extends BaseUi {
         }
     }
 
-    private static IElement HINT_ITEM_ELEMENT;
+
     private static final ItemStack HINT_ITEM_LOADING = new ItemStack(Material.BARRIER);
     private static final BasicItemMatcher MATCHER_LOADING = new BasicItemMatcher();
 
@@ -155,7 +154,6 @@ public class CraftingTableAccess extends BaseUi {
             itemMeta.setLore(Arrays.asList(I18n.format("hint.lore.loading").split("\n")));
         }
         HINT_ITEM_LOADING.setItemMeta(itemMeta);
-        HINT_ITEM_ELEMENT = RecipeManager.getItem(HINT_ITEM_LOADING);
     }
 
     static {
@@ -167,19 +165,20 @@ public class CraftingTableAccess extends BaseUi {
     private void checkAndRefreshRecipe() {
         Utils.newChain().delay(1).sync(input -> {
             checking = true;
-            setResultItem(HINT_ITEM_ELEMENT);
+            setResultItem(HINT_ITEM_LOADING.clone());
             return null;
         }).async(input -> {
             try{
                 return BukkitFuser.getInstance().fuseItem(this);
             }catch (Exception e){
+                e.printStackTrace();
                 return null;
             }
         }).sync(input -> {
             checking = false;
             recipe = input;
             if (input == null){
-                setResultItem(RecipeManager.getEmptyElement());
+                setResultItem(RecipeManager.getEmptyElement().getItemStack());
                 return null;
             }
             setResultItem(input.getResultItem());

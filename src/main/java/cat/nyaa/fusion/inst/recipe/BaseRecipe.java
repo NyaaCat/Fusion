@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BaseRecipe extends NamedFileConfig implements IRecipe {
     @Serializable
@@ -46,15 +47,15 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
     }
 
     @Override
-    public IElement getResultItem() {
-        return RecipeManager.getItem(resultItem);
+    public ItemStack getResultItem() {
+        return resultItem.clone();
     }
 
     Integer count;
 
     @Override
-    public List<IElement> getRawRecipe() {
-        return recipies;
+    public List<ItemStack> getRawRecipe() {
+        return recipies.stream().map(IElement::getItemStack).collect(Collectors.toList());
     }
 
     @Override
@@ -71,10 +72,10 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
     }
 
     @Override
-    public boolean matches(List<IElement> matrix) {
+    public boolean matches(List<ItemStack> matrix) {
         for (int i = 0; i < recipies.size(); i++) {
             IElement itemStack = recipies.get(i);
-            IElement item = matrix.get(i);
+            IElement item = RecipeManager.getItem(matrix.get(i));
             if (itemStack == null) {
                 if (item != null) {
                     return false;

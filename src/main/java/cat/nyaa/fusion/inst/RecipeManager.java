@@ -164,7 +164,7 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
         });
     }
 
-    public IRecipe getRecipe(List<IElement> itemStacks){
+    public IRecipe getRecipe(List<ItemStack> itemStacks){
         int count = 0;
         for (int i = 0; i < itemStacks.size(); i++) {
             if (! itemStacks.get(i).equals(EMPTY_ELEMENT)) {

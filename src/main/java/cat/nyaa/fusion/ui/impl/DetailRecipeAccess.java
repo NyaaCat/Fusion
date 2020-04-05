@@ -1,18 +1,14 @@
 package cat.nyaa.fusion.ui.impl;
 
-import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.fusion.inst.RecipeManager;
-import cat.nyaa.fusion.ui.*;
+import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DetailRecipeAccess extends BaseUi {
@@ -43,25 +39,25 @@ public class DetailRecipeAccess extends BaseUi {
     }
 
     @Override
-    public void setItemAt(int row, int col, IElement itemStack) {
+    public void setItemAt(int row, int col, ItemStack itemStack) {
         int actualIndex = matrixCoordinate.access(row, col);
-        inventory.setItem(actualIndex, Utils.getFakeItem(itemStack.getItemStack()));
+        inventory.setItem(actualIndex, Utils.getFakeItem(itemStack));
     }
 
     @Override
-    public void setItemAt(int index, IElement itemStack) {
+    public void setItemAt(int index, ItemStack itemStack) {
         setItemAt(index / 3, index % 3, itemStack);
     }
 
     @Override
-    public IElement getItemAt(int row, int col) {
+    public ItemStack getItemAt(int row, int col) {
         int actualIndex = matrixCoordinate.access(row, col);
         ItemStack item = inventory.getItem(actualIndex);
-        return RecipeManager.getItem(item);
+        return item;
     }
 
     @Override
-    public IElement getItemAt(int index) {
+    public ItemStack getItemAt(int index) {
         return getItemAt(index / 3, index % 3);
     }
 
@@ -76,15 +72,15 @@ public class DetailRecipeAccess extends BaseUi {
         if (getCurrentPage()>recipes.size()){
             setPage(0);
         }
-        List<IElement> rawRecipe = recipes.get(getCurrentPage()).getRawRecipe();
+        List<ItemStack> rawRecipe = recipes.get(getCurrentPage()).getRawRecipe();
         setContent(rawRecipe);
         setResultItem(recipe.getResultItem());
     }
 
     @Override
-    public void setResultItem(IElement item) {
+    public void setResultItem(ItemStack item) {
         Utils.newChain().delay(2).sync(() -> {
-            inventory.setItem(resultSlot.access(matrixCoordinate), Utils.getFakeItem(item.getItemStack()));
+            inventory.setItem(resultSlot.access(matrixCoordinate), Utils.getFakeItem(item));
         }).execute();
     }
 

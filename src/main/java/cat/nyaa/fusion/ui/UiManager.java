@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
-import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -73,14 +72,14 @@ public class UiManager {
                                     for (int i = 0; i < 9; i++) {
                                         if (baseUi.getItemAt(i).equals(RecipeManager.getEmptyElement())) {
                                             found = i;
-                                            baseUi.setItemAt(i, RecipeManager.getItem(currentItem));
+                                            baseUi.setItemAt(i, currentItem);
                                             event.getView().setItem(event.getRawSlot(), new ItemStack(Material.AIR));
                                             break;
                                         }
                                     }
                                 }catch (Exception e){
                                     Bukkit.getLogger().log(Level.SEVERE, "exception during item transaction. rolling back.");
-                                    baseUi.setItemAt(found, RecipeManager.getEmptyElement());
+                                    baseUi.setItemAt(found, RecipeManager.getEmptyElement().getItemStack());
                                     event.getView().setItem(event.getRawSlot(), currentItem);
                                 }
                             }

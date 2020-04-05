@@ -1,21 +1,15 @@
 package cat.nyaa.fusion.config.recipe;
 
-import cat.nyaa.fusion.config.element.IElement;
-import cat.nyaa.fusion.ui.IRecipeGUIAccess;
 import cat.nyaa.nyaacore.configuration.ISerializable;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 public interface IRecipe extends ISerializable {
-    IElement getResultItem();
-    List<IElement> getRawRecipe();
+    ItemStack getResultItem();
+    List<ItemStack> getRawRecipe();
     int getElementCount();
     String getName();
 
-    boolean matches(List<IElement> matrix);
-
-    default void updateGUI(IRecipeGUIAccess guiAccess){
-        List<IElement> rawRecipe = getRawRecipe();
-        guiAccess.setContent(rawRecipe, getResultItem());
-    }
+    boolean matches(List<ItemStack> matrix);
 }

@@ -3,7 +3,6 @@ package cat.nyaa.fusion.inst.element;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.inst.BaseElement;
 import cat.nyaa.fusion.inst.ElementMeta;
-import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.nyaacore.BasicItemMatcher;
 import cat.nyaa.nyaacore.utils.ItemStackUtils;
 import org.bukkit.Material;
@@ -38,7 +37,7 @@ public class VanillaElement extends BaseElement {
 
     @Override
     public ItemStack getItemStack() {
-        return itemStack;
+        return itemStack.clone();
     }
 
     public void setItemStack(ItemStack itemStack){

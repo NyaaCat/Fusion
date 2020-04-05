@@ -1,6 +1,5 @@
 package cat.nyaa.fusion;
 
-import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
@@ -8,12 +7,10 @@ import cat.nyaa.fusion.ui.UiManager;
 import cat.nyaa.fusion.ui.impl.CraftingTableAccess;
 import cat.nyaa.fusion.ui.impl.DetailRecipeAccess;
 import cat.nyaa.fusion.ui.impl.ListRecipeAccess;
-import cat.nyaa.fusion.util.Utils;
 import cat.nyaa.nyaacore.ILocalizer;
 import cat.nyaa.nyaacore.cmdreceiver.Arguments;
 import cat.nyaa.nyaacore.cmdreceiver.CommandReceiver;
 import cat.nyaa.nyaacore.cmdreceiver.SubCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -115,13 +112,13 @@ public class DebugCommand extends CommandReceiver implements Listener {
     }
 
     private void fillContent(BaseUi access){
-        List<IElement> content = new ArrayList<>();
+        List<ItemStack> content = new ArrayList<>();
         for (int i = 0; i < access.size(); i++) {
             ItemStack sample = new ItemStack(Material.DIAMOND, 1);
             ItemMeta itemMeta = sample.getItemMeta();
             itemMeta.setDisplayName(String.valueOf(i));
             sample.setItemMeta(itemMeta);
-            content.add(RecipeManager.getItem(sample));
+            content.add(sample);
         }
             access.setContent(content);
     }

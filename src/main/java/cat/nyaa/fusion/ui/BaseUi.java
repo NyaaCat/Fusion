@@ -1,10 +1,8 @@
 package cat.nyaa.fusion.ui;
 
-import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.ui.buttons.GUIButton;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
@@ -65,21 +63,21 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     }
 
     @Override
-    public void setContent(List<IElement> rawRecipe, IElement resultItem) {
+    public void setContent(List<ItemStack> rawRecipe, ItemStack resultItem) {
         setContent(rawRecipe);
         setResultItem(resultItem);
     }
 
     @Override
-    public void setContent(List<IElement> rawRecipe) {
+    public void setContent(List<ItemStack> rawRecipe) {
         for (int i = 0; i < rawRecipe.size(); i++) {
             setItemAt(i, rawRecipe.get(i));
         }
     }
 
     @Override
-    public List<IElement> getContent() {
-        List<IElement> content = new ArrayList<>();
+    public List<ItemStack> getContent() {
+        List<ItemStack> content = new ArrayList<>();
         for (int i = 0; i < 9; i++) {
             content.add(getItemAt(i));
         }
@@ -87,14 +85,14 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     }
 
     @Override
-    public void setResultItem(IElement item) {
-        inventory.setItem(resultSlot.access(matrixCoordinate), item.getItemStack());
+    public void setResultItem(ItemStack item) {
+        inventory.setItem(resultSlot.access(matrixCoordinate), item.clone());
     }
 
     @Override
-    public void setItemAt(int row, int col, IElement itemStack) {
+    public void setItemAt(int row, int col, ItemStack itemStack) {
         int actualIndex = matrixCoordinate.access(row, col);
-        inventory.setItem(actualIndex, itemStack.getItemStack());
+        inventory.setItem(actualIndex, itemStack);
     }
 
     @Override

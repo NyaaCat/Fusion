@@ -1,8 +1,6 @@
 package cat.nyaa.fusion.ui.impl;
 
-import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
 import cat.nyaa.fusion.ui.UiManager;
@@ -34,23 +32,23 @@ public class ListRecipeAccess extends BaseUi {
     }
 
     @Override
-    public void setItemAt(int index, IElement itemStack) {
+    public void setItemAt(int index, ItemStack itemStack) {
         setItemAt(index / 5, index % 5, itemStack);
     }
 
     @Override
-    public void setItemAt(int row, int col, IElement itemStack) {
+    public void setItemAt(int row, int col, ItemStack itemStack) {
         int actualIndex = matrixCoordinate.access(row, col);
-        inventory.setItem(actualIndex, Utils.getFakeItem(itemStack.getItemStack()));
+        inventory.setItem(actualIndex, Utils.getFakeItem(itemStack));
     }
 
     @Override
-    public IElement getItemAt(int row, int col) {
-        return RecipeManager.getItem(inventory.getItem(matrixCoordinate.access(row, col)));
+    public ItemStack getItemAt(int row, int col) {
+        return inventory.getItem(matrixCoordinate.access(row, col));
     }
 
     @Override
-    public IElement getItemAt(int index) {
+    public ItemStack getItemAt(int index) {
         return getItemAt(index / 5, index % 5);
     }
 
@@ -68,7 +66,7 @@ public class ListRecipeAccess extends BaseUi {
     @Override
     public void refreshUi() {
         if (recipes == null)return;
-        List<IElement> collect = recipes.stream()
+        List<ItemStack> collect = recipes.stream()
                 .skip(getPageSize() * getCurrentPage())
                 .limit(getPageSize())
                 .map(IRecipe::getResultItem)
