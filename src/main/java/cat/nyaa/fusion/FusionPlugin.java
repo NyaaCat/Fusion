@@ -2,6 +2,8 @@ package cat.nyaa.fusion;
 
 import cat.nyaa.fusion.config.ConfigMain;
 import cat.nyaa.fusion.inst.RecipeManager;
+import cat.nyaa.fusion.ui.UiManager;
+import cat.nyaa.fusion.util.Utils;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class FusionPlugin extends JavaPlugin {
@@ -33,6 +35,9 @@ public class FusionPlugin extends JavaPlugin {
         i18n = new I18n(configMain.language);
         i18n.load();
         RecipeManager instance = RecipeManager.getInstance();
-        instance.loadFromDir();
+        Utils.newChain().delay(1)
+                .sync(instance::loadFromDir)
+                .execute();
+        UiManager.getInstance();
     }
 }

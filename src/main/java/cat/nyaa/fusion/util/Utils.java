@@ -40,12 +40,18 @@ public class Utils {
         ItemMeta fakeMeta = fakeItem.getItemMeta();
         if (itemMeta == null){
             fakeItem = new ItemStack(Material.AIR);
+            return fakeItem;
         }
         List<String> lore = itemMeta.getLore();
+        if (lore == null){
+            lore = new ArrayList<>();
+        }
         lore.add(I18n.format("fake_item_lore"));
         fakeMeta.setDisplayName(itemMeta.getDisplayName());
         fakeMeta.setLore(lore);
-        fakeMeta.setCustomModelData(itemMeta.getCustomModelData());
+        if (itemMeta.hasCustomModelData()){
+            fakeMeta.setCustomModelData(itemMeta.getCustomModelData());
+        }
         Map<Enchantment, Integer> enchants = itemMeta.getEnchants();
         if (!enchants.isEmpty()) {
             enchants.forEach((enchantment, integer) -> {

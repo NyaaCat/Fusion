@@ -29,10 +29,8 @@ public class BukkitFuser implements Fuser {
 
 
     @Override
-    public ItemStack fuseItem(IRecipeGUIAccess guiAccess) {
+    public IRecipe fuseItem(IRecipeGUIAccess guiAccess) {
         List<IElement> content = guiAccess.getContent();
-        RecipeManager.getInstance().getRecipe(content);
-
-        return null;
+        return RecipeManager.getInstance().getRecipe(content);
     }
 }

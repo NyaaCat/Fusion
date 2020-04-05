@@ -5,7 +5,11 @@ import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
+import cat.nyaa.fusion.ui.UiManager;
 import cat.nyaa.fusion.util.Utils;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -63,6 +67,7 @@ public class ListRecipeAccess extends BaseUi {
 
     @Override
     public void refreshUi() {
+        if (recipes == null)return;
         List<IElement> collect = recipes.stream()
                 .skip(getPageSize() * getCurrentPage())
                 .limit(getPageSize())
@@ -78,11 +83,36 @@ public class ListRecipeAccess extends BaseUi {
 
     @Override
     public void onContentInteract(InventoryInteractEvent event) {
-
+        event.setCancelled(true);
+        if (event instanceof InventoryClickEvent){
+            int rawSlot = ((InventoryClickEvent) event).getRawSlot();
+            int i = matrixCoordinate.indexOf(rawSlot);
+            if (i == -1){
+                return;
+            }
+            IRecipe iRecipe = recipes.stream()
+                    .skip(getPageSize() * getCurrentPage())
+                    .skip(i)
+                    .findFirst().orElse(null);
+            if (iRecipe == null){
+                return;
+            }
+            HumanEntity whoClicked = event.getWhoClicked();
+            DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess((Player) whoClicked, iRecipe);
+            whoClicked.closeInventory();
+            Utils.newChain().sync(()->{
+                whoClicked.openInventory(detailRecipeAccess.getInventory());
+            }).execute();
+        }
     }
 
     @Override
     public void onResultInteract(InventoryInteractEvent event, ItemStack itemStack) {
+        event.setCancelled(true);
+    }
 
+    @Override
+    public boolean isResultClick(int rawSlot) {
+        return false;
     }
 }

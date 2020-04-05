@@ -2,6 +2,7 @@ package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.I18n;
 import cat.nyaa.fusion.config.element.IElement;
+import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.fuser.BukkitFuser;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.*;
@@ -25,6 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CraftingTableAccess extends BaseUi {
+
+    private IRecipe recipe;
+
     public CraftingTableAccess(List<Integer> recipeSpace, Inventory largeChestInventory) {
         super(recipeSpace, largeChestInventory);
     }
@@ -44,17 +48,17 @@ public class CraftingTableAccess extends BaseUi {
 
     @Override
     public void setItemAt(int index, IElement itemStack) {
-        setItemAt(index/3, index%3, itemStack);
+        setItemAt(index / 3, index % 3, itemStack);
     }
 
     @Override
     public IElement getItemAt(int row, int col) {
-        return getItemAt(row*3+col);
+        return RecipeManager.getItem(inventory.getItem(matrixCoordinate.access(row, col)));
     }
 
     @Override
     public IElement getItemAt(int index) {
-        return RecipeManager.getItem(inventory.getItem(index));
+        return getItemAt(index/3, index%3);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class CraftingTableAccess extends BaseUi {
 
     @Override
     public void refreshUi() {
-
+        checkAndRefreshRecipe();
     }
 
     @Override
@@ -92,23 +96,52 @@ public class CraftingTableAccess extends BaseUi {
 
     @Override
     public void onResultInteract(InventoryInteractEvent event, ItemStack itemStack) {
-        if (checking || !(event instanceof InventoryClickEvent)){
+        if (checking || !(event instanceof InventoryClickEvent)) {
+            event.setCancelled(true);
             return;
         }
         InventoryAction action = ((InventoryClickEvent) event).getAction();
+        IRecipe recipe = getRecipe();
+        if (recipe == null) {
+            return;
+        }
         event.setCancelled(false);
-        switch (action){
+        switch (action) {
             case PICKUP_ALL:
-
+                costItem();
                 break;
             case PICKUP_ONE:
-
+                costItem();
                 break;
+            case MOVE_TO_OTHER_INVENTORY:
+                costItem();
             default:
                 event.setCancelled(true);
                 break;
         }
+    }
 
+    private boolean validate(IRecipe recipe) {
+        return recipe.matches(getContent());
+    }
+
+
+    private IRecipe getRecipe() {
+        return recipe;
+    }
+
+    private void costItem() {
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = getItemAt(i).getItemStack();
+            if (!itemStack.getType().isAir()) {
+                int amount = itemStack.getAmount();
+                if (amount == 1){
+                    itemStack.setType(Material.AIR);
+                    continue;
+                }
+                itemStack.setAmount(amount - 1);
+            }
+        }
     }
 
     private static IElement HINT_ITEM_ELEMENT;
@@ -121,6 +154,7 @@ public class CraftingTableAccess extends BaseUi {
             itemMeta.setDisplayName(I18n.format("hint.name.loading"));
             itemMeta.setLore(Arrays.asList(I18n.format("hint.lore.loading").split("\n")));
         }
+        HINT_ITEM_LOADING.setItemMeta(itemMeta);
         HINT_ITEM_ELEMENT = RecipeManager.getItem(HINT_ITEM_LOADING);
     }
 
@@ -130,16 +164,25 @@ public class CraftingTableAccess extends BaseUi {
 
     boolean checking = false;
 
-    private void checkAndRefreshRecipe(){
-        Utils.newChain().sync(input -> {
+    private void checkAndRefreshRecipe() {
+        Utils.newChain().delay(1).sync(input -> {
             checking = true;
             setResultItem(HINT_ITEM_ELEMENT);
             return null;
         }).async(input -> {
-            return BukkitFuser.getInstance().fuseItem(this);
+            try{
+                return BukkitFuser.getInstance().fuseItem(this);
+            }catch (Exception e){
+                return null;
+            }
         }).sync(input -> {
             checking = false;
-            setResultItem(RecipeManager.getItem(input));
+            recipe = input;
+            if (input == null){
+                setResultItem(RecipeManager.getEmptyElement());
+                return null;
+            }
+            setResultItem(input.getResultItem());
             return null;
         }).execute();
     }
@@ -149,6 +192,7 @@ public class CraftingTableAccess extends BaseUi {
         boolean valid = result != null && !result.getType().equals(Material.AIR) && !MATCHER_LOADING.matches(result);
         return valid;
     }
+
     @Override
     public void onInventoryClose(InventoryCloseEvent event) {
         HumanEntity player = event.getPlayer();

@@ -5,6 +5,6 @@ import cat.nyaa.fusion.ui.IRecipeGUIAccess;
 import org.bukkit.inventory.ItemStack;
 
 public interface Fuser {
-    ItemStack fuseItem(IRecipeGUIAccess guiAccess);
+    IRecipe fuseItem(IRecipeGUIAccess guiAccess);
 
 }

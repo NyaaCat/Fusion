@@ -4,10 +4,9 @@ import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
-import cat.nyaa.fusion.ui.IRecipeGUIAccess;
+import cat.nyaa.fusion.ui.UiManager;
 import cat.nyaa.fusion.ui.impl.CraftingTableAccess;
 import cat.nyaa.fusion.ui.impl.DetailRecipeAccess;
-import cat.nyaa.fusion.ui.impl.InspectSessionAccess;
 import cat.nyaa.fusion.ui.impl.ListRecipeAccess;
 import cat.nyaa.fusion.util.Utils;
 import cat.nyaa.nyaacore.ILocalizer;
@@ -96,48 +95,23 @@ public class DebugCommand extends CommandReceiver implements Listener {
     @SubCommand("testCraftingTable")
     public void testCraftingTable(CommandSender sender, Arguments arguments){
         Player player = asPlayer(sender);
-        Inventory inventory = Bukkit.createInventory(player, 27);
-        List<Integer> sec = Utils.getGuiSection(0, 2, 3, 5);
-        CraftingTableAccess craftingTableAccess = new CraftingTableAccess(sec, inventory);
-        player.openInventory(inventory);
-        fillContent(craftingTableAccess);
-        ItemStack sample = new ItemStack(Material.DIAMOND, 1);
-        ItemMeta itemMeta = sample.getItemMeta();
-        itemMeta.setDisplayName("result");
-        sample.setItemMeta(itemMeta);
-        craftingTableAccess.setResultItem(RecipeManager.getItem(sample));
+        CraftingTableAccess craftingTableAccess = UiManager.newCraftingSession(player);
+        player.openInventory(craftingTableAccess.getInventory());
     }
 
     @SubCommand("testListAccess")
     public void testListSession(CommandSender sender, Arguments arguments){
         Player player = asPlayer(sender);
-        Inventory inventory = Bukkit.createInventory(player, 27);
-        List<Integer> sec = Utils.getGuiSection(0, 2, 3, 5);
-        List<IRecipe> recipes = RecipeManager.getInstance().getRecipes();
-        ListRecipeAccess craftingTableAccess = new ListRecipeAccess(sec, inventory, recipes);
-        player.openInventory(inventory);
-        fillContent(craftingTableAccess);
-        ItemStack sample = new ItemStack(Material.DIAMOND, 1);
-        ItemMeta itemMeta = sample.getItemMeta();
-        itemMeta.setDisplayName("result");
-        sample.setItemMeta(itemMeta);
-        craftingTableAccess.setResultItem(RecipeManager.getItem(sample));
+        ListRecipeAccess craftingTableAccess = UiManager.newListRecipeAccess(player);
+        player.openInventory(craftingTableAccess.getInventory());
     }
 
     @SubCommand("testDetailAccess")
     public void testDetailSession(CommandSender sender, Arguments arguments) {
         Player player = asPlayer(sender);
-        Inventory inventory = Bukkit.createInventory(player, 27);
-        List<Integer> sec = Utils.getGuiSection(0, 2, 3, 5);
-        List<IRecipe> recipes = RecipeManager.getInstance().getRecipes();
-        DetailRecipeAccess craftingTableAccess = new DetailRecipeAccess(sec, inventory, recipes.get(0));
-        player.openInventory(inventory);
-        fillContent(craftingTableAccess);
-        ItemStack sample = new ItemStack(Material.DIAMOND, 1);
-        ItemMeta itemMeta = sample.getItemMeta();
-        itemMeta.setDisplayName("result");
-        sample.setItemMeta(itemMeta);
-        craftingTableAccess.setResultItem(RecipeManager.getItem(sample));
+        IRecipe recipe = RecipeManager.getInstance().getRecipes().get(0);
+        DetailRecipeAccess craftingTableAccess = UiManager.newDetailRecipeAccess(player, recipe);
+        player.openInventory(craftingTableAccess.getInventory());
     }
 
     private void fillContent(BaseUi access){

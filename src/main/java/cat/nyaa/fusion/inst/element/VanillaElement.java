@@ -30,6 +30,9 @@ public class VanillaElement extends BaseElement {
 
     @Override
     public boolean match(ItemStack itemStack) {
+        if(itemStack.getType().isAir()){
+            return this.itemStack.getType().isAir();
+        }
         return itemMatcher.matches(itemStack);
     }
 

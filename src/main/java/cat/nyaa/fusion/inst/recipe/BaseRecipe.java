@@ -116,5 +116,6 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
 
     public void setResult(IElement item) {
         resultItemNbt = item.getElementHandler().serialize();
+        resultItem = item.getItemStack();
     }
 }

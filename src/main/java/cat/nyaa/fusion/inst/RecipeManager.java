@@ -160,7 +160,7 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
             int elementCount = baseRecipe.getElementCount();
             String name = baseRecipe.getName();
             recipeById.put(name, baseRecipe);
-            recipeByElementCount.computeIfAbsent(elementCount, (ignored) -> new ArrayList<>()).add(elementCount, baseRecipe);
+            recipeByElementCount.computeIfAbsent(elementCount, (ignored) -> new ArrayList<>()).add(baseRecipe);
         });
     }
 
@@ -186,7 +186,7 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
         recipeById.put(key, config);
         config.setName(key);
         int elementCount = config.getElementCount();
-        recipeByElementCount.computeIfAbsent(elementCount, (ignored) -> new ArrayList<>()).add(elementCount, config);
+        recipeByElementCount.computeIfAbsent(elementCount, (ignored) -> new ArrayList<>()).add(config);
         return key;
     }
 

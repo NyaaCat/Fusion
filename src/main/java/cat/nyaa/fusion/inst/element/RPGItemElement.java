@@ -1,5 +1,6 @@
 package cat.nyaa.fusion.inst.element;
 
+import cat.nyaa.fusion.FusionPlugin;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.inst.BaseElement;
 import cat.nyaa.fusion.inst.ElementMeta;
@@ -11,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import think.rpgitems.item.ItemManager;
 import think.rpgitems.item.RPGItem;
 
@@ -23,7 +25,7 @@ public class RPGItemElement extends BaseElement {
     String itemName = "";
 
     private RPGItem elementRgi;
-    private WeakReference<ItemStack> itemReference = new WeakReference<>(new ItemStack(Material.AIR));
+    private ItemStack rgiItem;
 
     public RPGItemElement() {
         super();
@@ -46,13 +48,18 @@ public class RPGItemElement extends BaseElement {
 
     @Override
     public ItemStack getItemStack() {
-        ItemStack itemStack = itemReference.get();
-        return itemStack == null ? createAndGetItem() : itemReference.get();
+         return rgiItem == null ? createAndGetItem() : rgiItem;
     }
 
     private ItemStack createAndGetItem() {
-        itemReference = new WeakReference<>(elementRgi.toItemStack());
-        return itemReference.get();
+        ItemStack itemStack = elementRgi.toItemStack();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                elementRgi.updateItem(itemStack);
+            }
+        }.runTaskLater(FusionPlugin.plugin, 1);
+        return itemStack;
     }
 
     public RPGItem getRGI() {
@@ -84,11 +91,13 @@ public class RPGItemElement extends BaseElement {
 
     @Override
     public IElement create(ItemStack itemStack) {
-        RPGItem rpgItem = ItemManager.toRPGItem(itemStack).orElse(null);
+        RPGItem rpgItem = ItemManager.toRPGItemByMeta(itemStack).orElse(null);
         if (rpgItem == null){
             throw new IllegalStateException("item is not RGI, but caught by handler: "+"rpgitem");
         }else {
-            return new RPGItemElement(String.valueOf(rpgItem.getUid()), rpgItem);
+            RPGItemElement rpgItemElement = new RPGItemElement(String.valueOf(rpgItem.getUid()), rpgItem);
+            rpgItemElement.rgiItem = itemStack;
+            return rpgItemElement;
         }
     }
 
@@ -108,13 +117,8 @@ public class RPGItemElement extends BaseElement {
         if (rpgItem == null){
             return RecipeManager.getEmptyElement();
         }
-        return RecipeManager.getItem(rpgItem.toItemStack());
-    }
-
-    @Override
-    public String getCacheKey(ItemStack itemStack) {
-        RPGItem rpgItem = ItemManager.toRPGItem(itemStack).orElse(null);
-        return rpgItem == null ? ItemStackUtils.itemToBase64(itemStack) :"rpgitem:"+rpgItem.getName();
+        ItemStack itemStack = rpgItem.toItemStack();
+        return RecipeManager.getItem(itemStack);
     }
 
     @Override

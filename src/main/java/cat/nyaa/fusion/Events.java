@@ -26,11 +26,4 @@ public class Events implements Listener {
     }
 
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onCraftChange(InventoryClickEvent event){
-        Inventory clickedInventory = event.getClickedInventory();
-        if (UiManager.getInstance().isCraftSession(clickedInventory) && clickedInventory instanceof CraftingInventory){
-
-        }
-    }
 }

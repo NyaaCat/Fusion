@@ -72,8 +72,20 @@ public class DetailRecipeAccess extends BaseUi {
 
     @Override
     public void refreshUi() {
+        if (recipes == null || recipes.size() == 0)return;
+        if (getCurrentPage()>recipes.size()){
+            setPage(0);
+        }
         List<IElement> rawRecipe = recipes.get(getCurrentPage()).getRawRecipe();
         setContent(rawRecipe);
+        setResultItem(recipe.getResultItem());
+    }
+
+    @Override
+    public void setResultItem(IElement item) {
+        Utils.newChain().delay(2).sync(() -> {
+            inventory.setItem(resultSlot.access(matrixCoordinate), Utils.getFakeItem(item.getItemStack()));
+        }).execute();
     }
 
     @Override
@@ -83,11 +95,16 @@ public class DetailRecipeAccess extends BaseUi {
 
     @Override
     public void onContentInteract(InventoryInteractEvent event) {
-
+        event.setCancelled(true);
     }
 
     @Override
     public void onResultInteract(InventoryInteractEvent event, ItemStack itemStack) {
+        event.setCancelled(true);
+    }
 
+    @Override
+    public boolean isResultClick(int rawSlot) {
+        return rawSlot == resultSlot.access(matrixCoordinate);
     }
 }

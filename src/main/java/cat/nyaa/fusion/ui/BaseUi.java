@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,7 +17,7 @@ import java.util.*;
 
 import static cat.nyaa.fusion.util.Utils.getGuiSection;
 
-public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, MatrixAccess, InteractiveUi{
+public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, MatrixAccess, InteractiveUi, InventoryHolder {
     protected final MatrixCoordinate matrixCoordinate;
     protected final Inventory inventory;
     protected final UiCoordinate resultSlot;
@@ -30,14 +31,13 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
         validClicks = new ArrayList<>(initialCapacity);
         initSlots(matrixCoordinate);
         resultSlot = new UiCoordinate(1, 4);
-        validClicks.add(resultSlot.access(matrixCoordinate));
         this.inventory = inventory;
         addSplitters();
     }
 
     protected void initSlots(MatrixCoordinate matrixCoordinate) {
-        for (int i = 0; i < matrixCoordinate.rows(); i++) {
-            for (int j = 0; j < matrixCoordinate.columns(); j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 UiCoordinate e = new UiCoordinate(i, j);
                 slots.add(e);
                 validClicks.add(e.access(matrixCoordinate));
@@ -174,4 +174,12 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
 
     }
 
+    public boolean isResultClick(int rawSlot){
+        return resultSlot.access(matrixCoordinate) == rawSlot;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
 }
