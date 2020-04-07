@@ -51,7 +51,7 @@ public class VanillaElement extends BaseElement {
             return;
         }
         nbt = ItemStackUtils.itemToBase64(itemStack);
-        this.itemStack = itemStack;
+        this.itemStack = itemStack.clone();
         itemMatcher.itemTemplate = this.itemStack;
     }
 

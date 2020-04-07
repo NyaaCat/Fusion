@@ -30,6 +30,12 @@ public class FusionPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(events, this);
     }
 
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        UiManager.closeAllInventory();
+    }
+
     public void onReload(){
         configMain = new ConfigMain();
         configMain.load();

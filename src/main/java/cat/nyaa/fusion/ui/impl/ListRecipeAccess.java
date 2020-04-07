@@ -1,6 +1,7 @@
 package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
+import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
 import cat.nyaa.fusion.ui.UiCoordinate;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,7 @@ public class ListRecipeAccess extends BaseUi {
 
     @Override
     public boolean isContentClicked(int rawSlot) {
+        if (rawSlot == 9) return true;
         int i = matrixCoordinate.indexOf(rawSlot);
         return i >= 0 && i < recipes.size() ;
     }
@@ -77,7 +80,10 @@ public class ListRecipeAccess extends BaseUi {
 
     @Override
     public void onInventoryClose(InventoryCloseEvent event) {
-        //todo new feature should give item back.
+        ItemStack item = inventory.getItem(9);
+        if (item != null){
+            Utils.returnItems(event.getPlayer(), Collections.singletonList(item));
+        }
     }
 
     @Override
@@ -101,6 +107,23 @@ public class ListRecipeAccess extends BaseUi {
         event.setCancelled(true);
         if (event instanceof InventoryClickEvent){
             int rawSlot = ((InventoryClickEvent) event).getRawSlot();
+            if (rawSlot == 9){
+                event.setCancelled(false);
+                Utils.newChain().delay(1).sync(()->{
+                    ItemStack item = inventory.getItem(rawSlot);
+                    if (item == null || item.getType().isAir()){
+                        this.recipes = RecipeManager.getInstance().getRecipes();
+                        refreshUi();
+                        return;
+                    }
+                    RecipeManager.createQuery(RecipeManager.getItem(item.clone()), recipes1 -> {
+                        this.recipes = recipes1;
+                        page = 0;
+                        refreshUi();
+                    });
+                }).execute();
+                return;
+            }
             int i = matrixCoordinate.indexOf(rawSlot);
             if (i == -1){
                 return;

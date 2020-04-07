@@ -142,7 +142,9 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
         Utils.newChain().async((ignored) ->{
             List<IRecipe> recipes = new ArrayList<>();
             getInstance().recipeById.forEach((s, iRecipe) -> {
-                if (iRecipe.getRawRecipe().contains(element)){
+                if (iRecipe.getRawRecipe().stream()
+                        .anyMatch(itemStack -> RecipeManager.getItem(itemStack).match(element.getItemStack()))
+                        || RecipeManager.getItem(iRecipe.getResultItem()).match(element.getItemStack())){
                     recipes.add(iRecipe);
                 }
             });

@@ -6,6 +6,8 @@ hint:
 recipe:
   add:
     success: "成功创建配方 <%s>"
+  remove:
+    not_found: "没有名为 %s 的配方"
 reload:
   complete: "&a成功重新加载Fusion"
 fake_item_lore: "&a展示用样品"

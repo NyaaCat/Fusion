@@ -117,8 +117,16 @@ public class UiManager {
             if (trackedInventory.containsKey(clickedInventory)){
                 event.setCancelled(true);
                 BaseUi baseUi = trackedInventory.get(clickedInventory);
+                if (event.getRawSlots().size() == 1){
+                    if (event.getRawSlots().iterator().next() == 9){
+                        InventoryClickEvent event1 = new InventoryClickEvent(event.getView(), InventoryType.SlotType.CONTAINER, 9, ClickType.LEFT, InventoryAction.PLACE_ALL);
+                        baseUi.onContentInteract(event1);
+                        event.setCancelled(event1.isCancelled());
+                        return;
+                    }
+                }
 
-                Set<Integer> inventorySlots = ((InventoryDragEvent) event).getInventorySlots();
+                Set<Integer> inventorySlots = ((InventoryDragEvent) event).getRawSlots();
                 boolean invalid = inventorySlots.stream()
                         .mapToInt(Integer::intValue)
                         .anyMatch(integer -> !baseUi.isContentClicked(integer));
@@ -207,5 +215,13 @@ public class UiManager {
         detailRecipeAccess.refreshUi();
         trackedInventory.put(fusion, detailRecipeAccess);
         return detailRecipeAccess;
+    }
+
+    public static void closeAllInventory() {
+        trackedInventory.values().forEach(baseUi -> baseUi.getInventory().getViewers().forEach(humanEntity -> {
+            InventoryCloseEvent inventoryCloseEvent = new InventoryCloseEvent(humanEntity.getOpenInventory());
+            baseUi.onInventoryClose(inventoryCloseEvent);
+            humanEntity.closeInventory();
+        }));
     }
 }

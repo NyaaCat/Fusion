@@ -5,6 +5,7 @@ import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.inst.recipe.BaseRecipe;
 import cat.nyaa.fusion.ui.UiManager;
 import cat.nyaa.fusion.ui.impl.CraftingTableAccess;
+import cat.nyaa.fusion.ui.impl.DetailRecipeAccess;
 import cat.nyaa.fusion.ui.impl.ListRecipeAccess;
 import cat.nyaa.nyaacore.ILocalizer;
 import cat.nyaa.nyaacore.Message;
@@ -103,6 +104,21 @@ public class AdminCommands extends CommandReceiver {
         RecipeManager.getInstance().remove(name);
         new Message(I18n.format("recipe.remove.success", name)).send(sender);
     }
+
+    @SubCommand(value = "inspect", permission = "fusion.admin", tabCompleter = "removeRecipeCompleter")
+    public void onInspect(CommandSender sender, Arguments arguments){
+        Player player = asPlayer(sender);
+        String name = arguments.nextString();
+
+        IRecipe recipe = RecipeManager.getInstance().getRecipe(name);
+        if (recipe == null){
+            new Message(I18n.format("recipe.remove.not_found", name)).send(sender);
+            return;
+        }
+        DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess(player, recipe);
+        player.openInventory(detailRecipeAccess.getInventory());
+    }
+
 
     public List<String> removeRecipeCompleter(CommandSender sender, Arguments arguments) {
         List<String> completeStr = new ArrayList<>();

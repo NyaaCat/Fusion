@@ -46,6 +46,7 @@ public class Utils {
             lore = new ArrayList<>();
         }
         lore.add(I18n.format("fake_item_lore"));
+        if (fakeMeta == null) return null;
         fakeMeta.setDisplayName(itemMeta.getDisplayName());
         fakeMeta.setLore(lore);
         if (itemMeta.hasCustomModelData()){

@@ -6,6 +6,10 @@ hint:
 recipe:
   add:
     success: "created recipe <%s>"
+  remove:
+    not_found: "no recipe named %s"
 reload:
   complete: "&areload complete"
+
+
 fake_item_lore: "&aThis item is a Sample"
