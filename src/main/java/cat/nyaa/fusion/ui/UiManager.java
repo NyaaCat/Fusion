@@ -10,20 +10,14 @@ import cat.nyaa.fusion.util.Utils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.logging.Level;
+import java.util.*;
 
 public class UiManager {
     public static UiManager INSTANCE;
@@ -50,7 +44,6 @@ public class UiManager {
     private static Map<Player, Stack<IQueryUiAccess>> windowStack = new HashMap<>();
 
     private static Listener listener = new Listener() {
-
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event){
             Inventory clickedInventory = event.getInventory();
@@ -60,40 +53,45 @@ public class UiManager {
                 BaseUi baseUi = trackedInventory.get(clickedInventory);
                 if (event.getClickedInventory()!= clickedInventory){
                     InventoryAction action = event.getAction();
+
                     event.setCancelled(false);
                     if (action.equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                         ItemStack currentItem = event.getCurrentItem();
                         event.setCancelled(true);
-                        new BukkitRunnable(){
-                            @Override
-                            public void run() {
-                                int found = 0;
-                                try {
-                                    for (int i = 0; i < 9; i++) {
-                                        if (baseUi.getItemAt(i).equals(RecipeManager.getEmptyElement())) {
-                                            found = i;
-                                            baseUi.setItemAt(i, currentItem);
-                                            event.getView().setItem(event.getRawSlot(), new ItemStack(Material.AIR));
-                                            break;
-                                        }
-                                    }
-                                }catch (Exception e){
-                                    Bukkit.getLogger().log(Level.SEVERE, "exception during item transaction. rolling back.");
-                                    baseUi.setItemAt(found, RecipeManager.getEmptyElement().getItemStack());
-                                    event.getView().setItem(event.getRawSlot(), currentItem);
-                                }
-                            }
-                        }.runTaskLater(FusionPlugin.plugin, 1);
+                        //disabled due to some issues.
+
+//                        new BukkitRunnable(){
+//                            @Override
+//                            public void run() {
+//                                int found = 0;
+//                                try {
+//                                    for (int i = 0; i < 9; i++) {
+//                                        if (baseUi.getItemAt(i).equals(RecipeManager.getEmptyElement())) {
+//                                            found = i;
+//                                            baseUi.setItemAt(i, currentItem);
+//                                            event.getView().setItem(event.getRawSlot(), new ItemStack(Material.AIR));
+//                                            break;
+//                                        }
+//                                    }
+//                                }catch (Exception e){
+//                                    Bukkit.getLogger().log(Level.SEVERE, "exception during item transaction. rolling back.");
+//                                    baseUi.setItemAt(found, RecipeManager.getEmptyElement().getItemStack());
+//                                    event.getView().setItem(event.getRawSlot(), currentItem);
+//                                }
+//                            }
+//                        }.runTaskLater(FusionPlugin.plugin, 1);
                     }
                     return;
                 }
                 int rawSlot = ((InventoryClickEvent) event).getRawSlot();
-                boolean validClick = baseUi.isValidClick(rawSlot);
+                boolean validClick = baseUi.isContentClicked(rawSlot);
                 event.setCancelled(false);
                 if (validClick){
                     baseUi.onContentInteract(event);
-                }else if (baseUi.isResultClick(rawSlot)){
+                }else if (baseUi.isResultClicked(rawSlot)){
                     baseUi.onResultInteract(event, clickedInventory.getItem(rawSlot));
+                }else if (baseUi.isButtonClicked(event.getRawSlot())){
+                    baseUi.onButtonClicked(event, baseUi.getButtonAt(event.getRawSlot()));
                 }else {
                     event.setCancelled(true);
                 }
@@ -102,7 +100,16 @@ public class UiManager {
 
             }
         }
-
+        @EventHandler
+        public void onSampleItemClick(InventoryClickEvent event){
+            ItemStack currentItem = event.getCurrentItem();
+            if (!trackedInventory.containsKey(event.getClickedInventory())){
+                if (Utils.isFakeItem(currentItem)){
+                    event.setCancelled(true);
+                    event.setCurrentItem(null);
+                }
+            }
+        }
         @EventHandler
         public void onInventoryDrag(InventoryDragEvent event){
             Inventory clickedInventory = event.getInventory();
@@ -110,10 +117,18 @@ public class UiManager {
             if (trackedInventory.containsKey(clickedInventory)){
                 event.setCancelled(true);
                 BaseUi baseUi = trackedInventory.get(clickedInventory);
-                boolean invalid = ((InventoryDragEvent) event).getInventorySlots().stream()
+
+                Set<Integer> inventorySlots = ((InventoryDragEvent) event).getInventorySlots();
+                boolean invalid = inventorySlots.stream()
                         .mapToInt(Integer::intValue)
-                        .anyMatch(integer -> !baseUi.isValidClick(integer));
-                event.setCancelled(invalid);
+                        .anyMatch(integer -> !baseUi.isContentClicked(integer));
+                int size = event.getView().getTopInventory().getSize();
+                boolean related = event.getRawSlots().stream().mapToInt(Integer::intValue)
+                        .anyMatch(integer -> integer < size);
+                event.setCancelled(invalid && related);
+                if (!invalid){
+                    baseUi.onContentInteract(event);
+                }
             }
         }
         @EventHandler
@@ -126,17 +141,17 @@ public class UiManager {
                 if (event instanceof InventoryDragEvent){
                     boolean invalid = ((InventoryDragEvent) event).getInventorySlots().stream()
                             .mapToInt(Integer::intValue)
-                            .anyMatch(integer -> !baseUi.isValidClick(integer));
+                            .anyMatch(integer -> !baseUi.isContentClicked(integer));
                     event.setCancelled(invalid);
                     return;
                 }
                 if (event instanceof InventoryClickEvent){
                     int rawSlot = ((InventoryClickEvent) event).getRawSlot();
-                    boolean validClick = baseUi.isValidClick(rawSlot);
+                    boolean validClick = baseUi.isContentClicked(rawSlot);
                     event.setCancelled(false);
                     if (validClick){
                         baseUi.onRawInteract(event);
-                    }else if (baseUi.isResultClick(rawSlot)){
+                    }else if (baseUi.isResultClicked(rawSlot)){
                         baseUi.onResultInteract(event, clickedInventory.getItem(rawSlot));
                     }else {
                         event.setCancelled(false);
@@ -147,7 +162,6 @@ public class UiManager {
 
             }
         }
-
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event){
             Inventory clickedInventory = event.getInventory();
@@ -179,7 +193,17 @@ public class UiManager {
 
     public static DetailRecipeAccess newDetailRecipeAccess(Player player, IRecipe recipe){
         Inventory fusion = Bukkit.createInventory(player, InventoryType.CHEST, "Fusion");
-        DetailRecipeAccess detailRecipeAccess = new DetailRecipeAccess(Utils.getGuiSection(0, 2, 3, 5), fusion, recipe);
+        List<IRecipe> recipes = RecipeManager.getInstance().getRecipes();
+        int recipeIndex = recipes.indexOf(recipe);
+        DetailRecipeAccess detailRecipeAccess = new DetailRecipeAccess(Utils.getGuiSection(0, 2, 3, 5), fusion, recipes, recipeIndex);
+        detailRecipeAccess.refreshUi();
+        trackedInventory.put(fusion, detailRecipeAccess);
+        return detailRecipeAccess;
+    }
+
+    public static DetailRecipeAccess newDetailRecipeAccess(Player player, List<IRecipe> recipes, int index){
+        Inventory fusion = Bukkit.createInventory(player, InventoryType.CHEST, "Fusion");
+        DetailRecipeAccess detailRecipeAccess = new DetailRecipeAccess(Utils.getGuiSection(0, 2, 3, 5), fusion, recipes, index);
         detailRecipeAccess.refreshUi();
         trackedInventory.put(fusion, detailRecipeAccess);
         return detailRecipeAccess;

@@ -6,11 +6,11 @@ import cat.nyaa.fusion.fuser.BukkitFuser;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
-import cat.nyaa.fusion.ui.UiCoordinate;
 import cat.nyaa.fusion.util.Utils;
 import cat.nyaa.nyaacore.BasicItemMatcher;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -23,6 +23,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CraftingTableAccess extends BaseUi {
 
@@ -63,17 +64,10 @@ public class CraftingTableAccess extends BaseUi {
     @Override
     protected void initSlots(MatrixCoordinate matrixCoordinate) {
         super.initSlots(matrixCoordinate);
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                UiCoordinate e = new UiCoordinate(i, j);
-                slots.add(e);
-                validClicks.add(e.access(matrixCoordinate));
-            }
-        }
     }
 
     @Override
-    public boolean isValidClick(int rawSlot) {
+    public boolean isContentClicked(int rawSlot) {
         return validClicks.contains(rawSlot);
     }
 
@@ -94,9 +88,14 @@ public class CraftingTableAccess extends BaseUi {
     }
 
     @Override
+    protected void initButton() {
+
+    }
+
+    @Override
     public void onResultInteract(InventoryInteractEvent event, ItemStack itemStack) {
+        event.setCancelled(true);
         if (checking || !(event instanceof InventoryClickEvent)) {
-            event.setCancelled(true);
             return;
         }
         InventoryAction action = ((InventoryClickEvent) event).getAction();
@@ -105,19 +104,40 @@ public class CraftingTableAccess extends BaseUi {
             return;
         }
         event.setCancelled(false);
-        switch (action) {
-            case PICKUP_ALL:
-                costItem();
-                break;
-            case PICKUP_ONE:
-                costItem();
-                break;
-            case MOVE_TO_OTHER_INVENTORY:
-                costItem();
-            default:
-                event.setCancelled(true);
-                break;
+        List<ItemStack> content = getContent().stream().map(itemStack1 -> itemStack1 == null? null : itemStack1.clone()).collect(Collectors.toList());
+        if (!doFinalCheck(recipe, content)){
+            event.setCancelled(true);
+            return;
         }
+        try {
+            switch (action) {
+                case PICKUP_ALL:
+                    costItem(recipe);
+                    break;
+                case PICKUP_ONE:
+                    costItem(recipe);
+                    break;
+                case MOVE_TO_OTHER_INVENTORY:
+                    costItem(recipe);
+                    break;
+                default:
+                    event.setCancelled(true);
+                    break;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            event.setCancelled(true);
+            setContent(content);
+        }
+        HumanEntity whoClicked = event.getWhoClicked();
+        if (whoClicked instanceof Player){
+            Utils.newChain().delay(1).sync(((Player) whoClicked)::updateInventory).execute();
+        }
+        checkAndRefreshRecipe();
+    }
+
+    private boolean doFinalCheck(IRecipe recipe, List<ItemStack> content) {
+        return recipe.matches(content);
     }
 
     private boolean validate(IRecipe recipe) {
@@ -129,16 +149,22 @@ public class CraftingTableAccess extends BaseUi {
         return recipe;
     }
 
-    private void costItem() {
+    private void costItem(IRecipe recipe) {
+        List<ItemStack> rawRecipe = recipe.getRawRecipe();
         for (int i = 0; i < 9; i++) {
             ItemStack itemStack = getItemAt(i);
-            if (!itemStack.getType().isAir()) {
+            ItemStack recipeCost = rawRecipe.get(i);
+            if (itemStack != null && !itemStack.getType().isAir()) {
                 int amount = itemStack.getAmount();
-                if (amount == 1){
+                int costAmount = recipeCost.getAmount();
+                if (amount < costAmount) throw new IllegalStateException("");
+                if (amount == costAmount){
                     itemStack.setType(Material.AIR);
+                    setItemAt(i, itemStack);
                     continue;
                 }
-                itemStack.setAmount(amount - 1);
+                itemStack.setAmount(amount - costAmount);
+                setItemAt(i, itemStack);
             }
         }
     }

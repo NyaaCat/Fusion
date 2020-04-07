@@ -167,11 +167,12 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
     public IRecipe getRecipe(List<ItemStack> itemStacks){
         int count = 0;
         for (int i = 0; i < itemStacks.size(); i++) {
-            if (! itemStacks.get(i).equals(EMPTY_ELEMENT)) {
+            ItemStack itemStack = itemStacks.get(i);
+            if (itemStack != null && !itemStack.getType().isAir()) {
                 count++;
             }
         }
-        List<IRecipe> recipes = recipeByElementCount.get(count);
+        List<IRecipe> recipes = recipeByElementCount.computeIfAbsent(count, (integer) -> new ArrayList<>());
         IRecipe iRecipe = recipes.stream().filter(recipe -> recipe.matches(itemStacks)).findAny().orElse(null);
         return iRecipe;
     }

@@ -32,7 +32,10 @@ public class VanillaElement extends BaseElement {
         if(itemStack.getType().isAir()){
             return this.itemStack.getType().isAir();
         }
-        return itemMatcher.matches(itemStack);
+        boolean matches = itemMatcher.matches(itemStack);
+        int amount = itemStack.getAmount();
+        int required = this.itemStack.getAmount();
+        return matches && (amount >= required);
     }
 
     @Override

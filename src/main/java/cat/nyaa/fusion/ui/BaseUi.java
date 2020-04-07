@@ -2,6 +2,7 @@ package cat.nyaa.fusion.ui;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.ui.buttons.GUIButton;
+import cat.nyaa.fusion.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -31,7 +32,10 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
         resultSlot = new UiCoordinate(1, 4);
         this.inventory = inventory;
         addSplitters();
+        initButton();
     }
+
+    protected abstract void initButton();
 
     protected void initSlots(MatrixCoordinate matrixCoordinate) {
         for (int i = 0; i < 3; i++) {
@@ -57,7 +61,8 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     protected static ItemStack createSplitter(Material material) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName("");
+        itemMeta.setDisplayName(" ");
+        Utils.markSample(itemMeta);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
@@ -70,6 +75,10 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
 
     @Override
     public void setContent(List<ItemStack> rawRecipe) {
+        ItemStack itemStack = new ItemStack(Material.AIR);
+        for (int i = 0; i < slots.size(); i++) {
+            setItemAt(i, itemStack);
+        }
         for (int i = 0; i < rawRecipe.size(); i++) {
             setItemAt(i, rawRecipe.get(i));
         }
@@ -112,7 +121,7 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
 
     public abstract void onInventoryClose(InventoryCloseEvent event);
 
-    private static Map<Integer, GUIButton> buttons = new HashMap<>();
+    protected Map<Integer, GUIButton> buttons = new HashMap<>();
     private static IRecipeGUIAccess recipeGui;
     private static List<Integer> recipeSpace = getGuiSection(0, 2, 3, 5);
     private int page = 0;
@@ -162,6 +171,9 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     @Override
     public void setButtonAt(int index, GUIButton button) {
         buttons.put(index, button);
+        ItemStack model = button.getModel();
+        Utils.markSample(model);
+        inventory.setItem(index, model);
     }
 
     private void setButtonAt(int row, int col, GUIButton button){
@@ -172,7 +184,13 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
 
     }
 
-    public boolean isResultClick(int rawSlot){
+    @Override
+    public boolean isButtonClicked(int rawSlot) {
+        return buttons.containsKey(rawSlot);
+    }
+
+    @Override
+    public boolean isResultClicked(int rawSlot){
         return resultSlot.access(matrixCoordinate) == rawSlot;
     }
 
@@ -180,4 +198,5 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     public Inventory getInventory() {
         return inventory;
     }
+
 }

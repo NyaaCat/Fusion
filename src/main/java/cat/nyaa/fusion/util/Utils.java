@@ -3,18 +3,15 @@ package cat.nyaa.fusion.util;
 import cat.nyaa.fusion.FusionPlugin;
 import cat.nyaa.fusion.I18n;
 import cat.nyaa.nyaacore.utils.InventoryUtils;
-import cat.nyaa.nyaacore.utils.ItemTagUtils;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -22,10 +19,11 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class Utils {
     private static TaskChainFactory factory;
+    private static final String KEY_MODEL = "fusion_model";
+    private static final NamespacedKey NAMESPACED_KEY_MODEL = new NamespacedKey(FusionPlugin.plugin, KEY_MODEL);
 
     public static TaskChain<?> newChain(){
         if (factory == null) {
@@ -42,6 +40,7 @@ public class Utils {
             fakeItem = new ItemStack(Material.AIR);
             return fakeItem;
         }
+        fakeItem.setAmount(itemStack.getAmount());
         List<String> lore = itemMeta.getLore();
         if (lore == null){
             lore = new ArrayList<>();
@@ -58,14 +57,20 @@ public class Utils {
                 fakeMeta.addEnchant(enchantment, integer, true);
             });
         }
+        markSample(fakeMeta);
         fakeItem.setItemMeta(fakeMeta);
-        try {
-            ItemTagUtils.setInt(fakeItem, "fusion_model", 1);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "exception creating model");
-            e.printStackTrace();
-        }
         return fakeItem;
+    }
+
+    public static void markSample(ItemMeta fakeMeta) {
+        fakeMeta.getPersistentDataContainer().set(NAMESPACED_KEY_MODEL, PersistentDataType.INTEGER, 1);
+    }
+
+    public static void markSample(ItemStack itemStack){
+        if (itemStack == null || itemStack.getItemMeta() == null)return;
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        markSample(itemMeta);
+        itemStack.setItemMeta(itemMeta);
     }
 
     public static List<Integer> getGuiSection(int row, int index, int rows, int cols) {
@@ -89,5 +94,13 @@ public class Utils {
             }
         });
 
+    }
+
+    public static boolean isFakeItem(ItemStack currentItem) {
+        if (currentItem == null){
+            return false;
+        }
+        ItemMeta itemMeta = currentItem.getItemMeta();
+        return itemMeta != null && itemMeta.getPersistentDataContainer().has(NAMESPACED_KEY_MODEL, PersistentDataType.INTEGER);
     }
 }

@@ -2,6 +2,8 @@ package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.ui.BaseUi;
+import cat.nyaa.fusion.ui.MatrixCoordinate;
+import cat.nyaa.fusion.ui.buttons.ButtonRegister;
 import cat.nyaa.fusion.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -14,9 +16,10 @@ import java.util.List;
 public class DetailRecipeAccess extends BaseUi {
     private final IRecipe recipe;
 
-    public DetailRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, IRecipe recipe){
+    public DetailRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipes, int recipeIndex){
         super(sectionIndexes, inventory);
-        this.recipe = recipe;
+        this.recipes = recipes;
+        this.recipe = recipes.get(recipeIndex);
         setContent(recipe.getRawRecipe());
         setResultItem(recipe.getResultItem());
     }
@@ -39,9 +42,21 @@ public class DetailRecipeAccess extends BaseUi {
     }
 
     @Override
+    protected void initButton() {
+        ButtonRegister instance = ButtonRegister.getInstance();
+        setButtonAt(26, instance.NEXT_PAGE);
+        setButtonAt(18, instance.PREVIOUS_PAGE);
+    }
+
+    @Override
     public void setItemAt(int row, int col, ItemStack itemStack) {
         int actualIndex = matrixCoordinate.access(row, col);
         inventory.setItem(actualIndex, Utils.getFakeItem(itemStack));
+    }
+
+    @Override
+    protected void initSlots(MatrixCoordinate matrixCoordinate) {
+        super.initSlots(matrixCoordinate);
     }
 
     @Override
@@ -62,7 +77,7 @@ public class DetailRecipeAccess extends BaseUi {
     }
 
     @Override
-    public boolean isValidClick(int rawSlot) {
+    public boolean isContentClicked(int rawSlot) {
         return validClicks.contains(rawSlot);
     }
 
@@ -84,6 +99,7 @@ public class DetailRecipeAccess extends BaseUi {
         }).execute();
     }
 
+
     @Override
     public int getPageSize() {
         return 1;
@@ -100,7 +116,7 @@ public class DetailRecipeAccess extends BaseUi {
     }
 
     @Override
-    public boolean isResultClick(int rawSlot) {
+    public boolean isResultClicked(int rawSlot) {
         return rawSlot == resultSlot.access(matrixCoordinate);
     }
 }

@@ -16,5 +16,4 @@ public interface IRecipeGUIAccess {
 
     void setResultItem(ItemStack item);
 
-    boolean isValidClick(int rawSlot);
 }

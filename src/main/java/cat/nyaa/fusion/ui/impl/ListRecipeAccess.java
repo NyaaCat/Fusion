@@ -3,7 +3,9 @@ package cat.nyaa.fusion.ui.impl;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.ui.BaseUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
+import cat.nyaa.fusion.ui.UiCoordinate;
 import cat.nyaa.fusion.ui.UiManager;
+import cat.nyaa.fusion.ui.buttons.ButtonRegister;
 import cat.nyaa.fusion.util.Utils;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -20,13 +22,10 @@ public class ListRecipeAccess extends BaseUi {
     private final int rows = 3;
     private final int cols = 5;
 
-    private final MatrixCoordinate matrixCoordinate;
     private final Inventory inventory;
-    private final List<IRecipe> recipes;
 
     public ListRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipe){
         super(sectionIndexes, inventory);
-        this.matrixCoordinate = new MatrixCoordinate(sectionIndexes, 3, 6);
         this.inventory = inventory;
         this.recipes = recipe;
     }
@@ -53,9 +52,27 @@ public class ListRecipeAccess extends BaseUi {
     }
 
     @Override
-    public boolean isValidClick(int rawSlot) {
+    public boolean isContentClicked(int rawSlot) {
         int i = matrixCoordinate.indexOf(rawSlot);
         return i >= 0 && i < recipes.size() ;
+    }
+
+    @Override
+    protected void initSlots(MatrixCoordinate matrixCoordinate) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 5; j++) {
+                UiCoordinate e = new UiCoordinate(i, j);
+                slots.add(e);
+                validClicks.add(e.access(matrixCoordinate));
+            }
+        }
+    }
+
+    @Override
+    protected void initButton() {
+        ButtonRegister instance = ButtonRegister.getInstance();
+        setButtonAt(26, instance.NEXT_PAGE);
+        setButtonAt(18, instance.PREVIOUS_PAGE);
     }
 
     @Override
@@ -96,6 +113,7 @@ public class ListRecipeAccess extends BaseUi {
                 return;
             }
             HumanEntity whoClicked = event.getWhoClicked();
+
             DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess((Player) whoClicked, iRecipe);
             whoClicked.closeInventory();
             Utils.newChain().sync(()->{
@@ -110,7 +128,7 @@ public class ListRecipeAccess extends BaseUi {
     }
 
     @Override
-    public boolean isResultClick(int rawSlot) {
+    public boolean isResultClicked(int rawSlot) {
         return false;
     }
 }

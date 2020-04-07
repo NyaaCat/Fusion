@@ -8,4 +8,8 @@ public interface InteractiveUi {
     void onContentInteract(InventoryInteractEvent event);
     void onResultInteract(InventoryInteractEvent event, ItemStack itemStack);
     void onButtonClicked(InventoryInteractEvent event, GUIButton button);
+
+    boolean isResultClicked(int rawSlot);
+    boolean isButtonClicked(int rawSlot);
+    boolean isContentClicked(int rawSlot);
 }

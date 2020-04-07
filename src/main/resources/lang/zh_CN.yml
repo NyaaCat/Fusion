@@ -1,5 +1,11 @@
 hint:
   name:
-    loading: "正在加载"
+    loading: "&r正在加载"
   lore:
-    loading: "请等待"
+    loading: "&a请等待"
+recipe:
+  add:
+    success: "成功创建配方 <%s>"
+reload:
+  complete: "&a成功重新加载Fusion"
+fake_item_lore: "&a展示用样品"
