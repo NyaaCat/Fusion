@@ -191,12 +191,28 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
         return key;
     }
 
+    private IRecipe removeConfig(String name){
+        IRecipe iRecipe = recipeById.remove(name);
+        if (iRecipe == null)return null;
+        int elementCount = iRecipe.getElementCount();
+        recipeByElementCount.computeIfAbsent(elementCount, (ignored) -> new ArrayList<>()).remove(iRecipe);
+        return iRecipe;
+    }
+
     @Override
     public String add(String name, BaseRecipe config) {
         String key = super.add(name, config);
         String s = addConfig(key, config);
         saveToDir();
         return s;
+    }
+
+    @Override
+    public BaseRecipe remove(String id) {
+        BaseRecipe remove = super.remove(id);
+        removeConfig(id);
+        saveToDir();
+        return remove;
     }
 
     @Override
@@ -218,5 +234,13 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
      */
     public void register(EventPriority priority, IElementHandler registerTest) {
         handlerRegistry.add(new Pair<>(priority.getSlot(), registerTest));
+    }
+
+    public IRecipe getRecipe(String name) {
+        return recipeById.get(name);
+    }
+
+    public Collection<? extends String> getRecipeNames() {
+        return recipeById.keySet();
     }
 }

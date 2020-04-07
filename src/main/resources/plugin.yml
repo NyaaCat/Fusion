@@ -1,7 +1,7 @@
 name: Fusion
 main: cat.nyaa.fusion.FusionPlugin
 description: "FusionPlugin"
-version: ${version}
+version: 1.0 beta
 depend: [NyaaCore,LangUtils]
 softdepend: [RPGItems]
 authors: [ReinWD]
@@ -16,14 +16,6 @@ commands:
     permission: fusion.admin
     permission-message: "You do not have the required permission: <permission>"
     usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
-  fusion_debug:
-    description: 'debug command for fusion'
-    permission: fusion.admin
-    aliases:
-      - fusd
-    permission-message: "You do not have the required permission: <permission>"
-    usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
-
 
 permissions:
   fusion.admin:

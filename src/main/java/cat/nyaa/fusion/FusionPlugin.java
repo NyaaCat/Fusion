@@ -24,7 +24,7 @@ public class FusionPlugin extends JavaPlugin {
         debugCommand = new DebugCommand(this, i18n);
         adminCommands = new AdminCommands(this, i18n);
         events = new Events(this);
-        getServer().getPluginCommand("fusion_debug").setExecutor(debugCommand);
+//        getServer().getPluginCommand("fusion_debug").setExecutor(debugCommand);
         getServer().getPluginCommand("fusion").setExecutor(adminCommands);
         getServer().getPluginManager().registerEvents(debugCommand, this);
         getServer().getPluginManager().registerEvents(events, this);

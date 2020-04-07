@@ -124,7 +124,7 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
     protected Map<Integer, GUIButton> buttons = new HashMap<>();
     private static IRecipeGUIAccess recipeGui;
     private static List<Integer> recipeSpace = getGuiSection(0, 2, 3, 5);
-    private int page = 0;
+    protected int page = 0;
     protected List<IRecipe> recipes = new ArrayList<>();
 
     @Override

@@ -1,5 +1,6 @@
 package cat.nyaa.fusion;
 
+import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.inst.recipe.BaseRecipe;
 import cat.nyaa.fusion.ui.UiManager;
@@ -55,13 +56,13 @@ public class AdminCommands extends CommandReceiver {
         player.openInventory(craftingTableAccess.getInventory());
     }
 
-    @SubCommand(value = "reload", permission = "fusion.user")
+    @SubCommand(value = "reload", permission = "fusion.admin")
     public void onReload(CommandSender sender, Arguments arguments){
         FusionPlugin.plugin.onReload();
         new Message(I18n.format("reload.complete")).send(sender);
     }
 
-    @SubCommand(value = "addRecipe", permission = "fusion.admin", tabCompleter = "addRecipeCompleter")
+    @SubCommand(value = "add", permission = "fusion.admin", tabCompleter = "addRecipeCompleter")
     public void onAddRecipe(CommandSender sender, Arguments arguments){
         Player player = asPlayer(sender);
         String name = arguments.nextString();
@@ -85,6 +86,29 @@ public class AdminCommands extends CommandReceiver {
         switch (arguments.remains()) {
             case 1:
                 completeStr.add("<name>");
+                break;
+        }
+        return filtered(arguments, completeStr);
+    }
+
+    @SubCommand(value = "remove", permission = "fusion.admin", tabCompleter = "removeRecipeCompleter")
+    public void onRemoveRecipe(CommandSender sender, Arguments arguments){
+        String name = arguments.nextString();
+
+        IRecipe recipe = RecipeManager.getInstance().getRecipe(name);
+        if (recipe == null){
+            new Message(I18n.format("recipe.remove.not_found", name)).send(sender);
+            return;
+        }
+        RecipeManager.getInstance().remove(name);
+        new Message(I18n.format("recipe.remove.success", name)).send(sender);
+    }
+
+    public List<String> removeRecipeCompleter(CommandSender sender, Arguments arguments) {
+        List<String> completeStr = new ArrayList<>();
+        switch (arguments.remains()) {
+            case 1:
+                completeStr.addAll(RecipeManager.getInstance().getRecipeNames());
                 break;
         }
         return filtered(arguments, completeStr);

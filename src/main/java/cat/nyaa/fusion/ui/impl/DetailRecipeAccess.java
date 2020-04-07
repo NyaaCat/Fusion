@@ -14,12 +14,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 public class DetailRecipeAccess extends BaseUi {
-    private final IRecipe recipe;
+    private IRecipe recipe;
 
     public DetailRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipes, int recipeIndex){
         super(sectionIndexes, inventory);
         this.recipes = recipes;
         this.recipe = recipes.get(recipeIndex);
+        this.setPage(recipeIndex);
         setContent(recipe.getRawRecipe());
         setResultItem(recipe.getResultItem());
     }
@@ -87,16 +88,15 @@ public class DetailRecipeAccess extends BaseUi {
         if (getCurrentPage()>recipes.size()){
             setPage(0);
         }
-        List<ItemStack> rawRecipe = recipes.get(getCurrentPage()).getRawRecipe();
+        recipe = recipes.get(getCurrentPage());
+        List<ItemStack> rawRecipe = recipe.getRawRecipe();
         setContent(rawRecipe);
         setResultItem(recipe.getResultItem());
     }
 
     @Override
     public void setResultItem(ItemStack item) {
-        Utils.newChain().delay(2).sync(() -> {
-            inventory.setItem(resultSlot.access(matrixCoordinate), Utils.getFakeItem(item));
-        }).execute();
+        inventory.setItem(resultSlot.access(matrixCoordinate), Utils.getFakeItem(item));
     }
 
 
