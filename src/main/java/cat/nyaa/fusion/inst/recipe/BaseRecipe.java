@@ -34,6 +34,11 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
         super(name);
     }
 
+    @Override
+    public String getConfigName() {
+        return name;
+    }
+
     public void addElement(IElement element){
         recipies.add(element);
         recipiesNbt.add(element.getElementHandler().serialize());

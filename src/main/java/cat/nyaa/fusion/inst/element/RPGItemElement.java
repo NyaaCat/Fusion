@@ -7,8 +7,6 @@ import cat.nyaa.fusion.inst.ElementMeta;
 import cat.nyaa.fusion.inst.IElementHandler;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.nyaacore.configuration.ISerializable;
-import cat.nyaa.nyaacore.utils.ItemStackUtils;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventPriority;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +14,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import think.rpgitems.item.ItemManager;
 import think.rpgitems.item.RPGItem;
 
-import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 @ElementMeta(priority = EventPriority.HIGH)
@@ -96,7 +93,7 @@ public class RPGItemElement extends BaseElement {
             throw new IllegalStateException("item is not RGI, but caught by handler: "+"rpgitem");
         }else {
             RPGItemElement rpgItemElement = new RPGItemElement(String.valueOf(rpgItem.getUid()), rpgItem);
-            rpgItemElement.rgiItem = itemStack;
+            rpgItemElement.rgiItem = itemStack.clone();
             return rpgItemElement;
         }
     }

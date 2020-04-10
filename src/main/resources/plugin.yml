@@ -13,7 +13,7 @@ commands:
   fusion:
     aliases: fus
     description: 'fusion plugin admin command'
-    permission: fusion.admin
+    permission: fusion.command
     permission-message: "You do not have the required permission: <permission>"
     usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
 
@@ -22,5 +22,8 @@ permissions:
     default: op
     description: 'admin permission for fusion plugin'
   fusion.user:
+    default: true
+    description: 'user permission for fusion plugin'
+  fusion.command:
     default: true
     description: 'user permission for fusion plugin'

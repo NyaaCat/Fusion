@@ -6,10 +6,7 @@ import cat.nyaa.nyaacore.utils.InventoryUtils;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
@@ -47,7 +44,10 @@ public class Utils {
         }
         lore.add(I18n.format("fake_item_lore"));
         if (fakeMeta == null) return null;
-        fakeMeta.setDisplayName(itemMeta.getDisplayName());
+        String displayName = itemMeta.getDisplayName();
+        if (!displayName.equals("")){
+            fakeMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r"+ displayName));
+        }
         fakeMeta.setLore(lore);
         if (itemMeta.hasCustomModelData()){
             fakeMeta.setCustomModelData(itemMeta.getCustomModelData());
