@@ -2,10 +2,11 @@ package cat.nyaa.fusion.ui;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.ui.buttons.GUIButton;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.List;
 
-public interface IQueryUiAccess {
+public interface IQueryUiAccess extends InventoryHolder {
     List<IRecipeGUIAccess> getRecipeGUIs();
 
     void setRecipes(List<IRecipe> recipes);
@@ -17,4 +18,6 @@ public interface IQueryUiAccess {
 
     GUIButton getButtonAt(int index);
     void setButtonAt(int index, GUIButton button);
+
+    void onReopen();
 }

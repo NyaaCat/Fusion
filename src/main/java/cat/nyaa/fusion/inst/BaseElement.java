@@ -1,9 +1,8 @@
 package cat.nyaa.fusion.inst;
 
+import cat.nyaa.fusion.config.QueryMode;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.fusion.inst.IElementHandler;
-import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.nyaacore.BasicItemMatcher;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public abstract class BaseElement implements IElement, IElementHandler {
 
     @Override
     public void queryRecipes(Consumer<List<IRecipe>> consumer) {
-        RecipeManager.createQuery(this, consumer);
+        RecipeManager.createQuery(this, consumer, QueryMode.ALL);
     }
 
     public BaseElement(String name) {

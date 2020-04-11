@@ -4,6 +4,7 @@ import cat.nyaa.fusion.ui.IQueryUiAccess;
 import cat.nyaa.fusion.ui.buttons.GUIButton;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -26,22 +27,12 @@ public class ButtonNextPage extends GUIButton {
     }
 
     @Override
-    public String getTitle() {
-        return title;
-    }
-
-    @Override
-    public List<String> getLores() {
-        return lores;
-    }
-
-    @Override
     public String getAction() {
         return "nextPage";
     }
 
     @Override
-    public void doAction(IQueryUiAccess iQueryUiAccess) {
+    public void doAction(InventoryInteractEvent event, IQueryUiAccess iQueryUiAccess) {
         int currentPage = iQueryUiAccess.getCurrentPage();
         int totalPages = getTotalPages(iQueryUiAccess);
         int nextPage = currentPage+1;
@@ -55,7 +46,7 @@ public class ButtonNextPage extends GUIButton {
     }
 
     @Override
-    public ItemStack getModel() {
+    public ItemStack getModel(IQueryUiAccess iQueryUiAccess) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&',title));

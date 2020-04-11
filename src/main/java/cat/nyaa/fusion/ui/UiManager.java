@@ -10,6 +10,7 @@ import cat.nyaa.fusion.util.Utils;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,7 +42,7 @@ public class UiManager {
         return INSTANCE;
     }
 
-    private static Map<Player, Stack<IQueryUiAccess>> windowStack = new HashMap<>();
+    private static Map<HumanEntity, Stack<BaseUi>> windowStack = new HashMap<>();
 
     private static Listener listener = new Listener() {
         @EventHandler
@@ -196,6 +197,8 @@ public class UiManager {
         ListRecipeAccess listRecipeAccess = new ListRecipeAccess(Utils.getGuiSection(0, 2, 3, 5), fusion, recipes);
         listRecipeAccess.refreshUi();
         trackedInventory.put(fusion, listRecipeAccess);
+        Stack<BaseUi> stack = windowStack.computeIfAbsent(player, humanEntity -> new Stack<>());
+        stack.clear();
         return listRecipeAccess;
     }
 
@@ -223,5 +226,30 @@ public class UiManager {
             baseUi.onInventoryClose(inventoryCloseEvent);
             humanEntity.closeInventory();
         }));
+    }
+
+    public static void openUiFor(HumanEntity whoClicked, BaseUi child, BaseUi parent) {
+        Stack<BaseUi> stack = windowStack.computeIfAbsent(whoClicked, player -> new Stack<>());
+        if (parent == null){
+            stack.clear();
+        }else {
+            stack.push(parent);
+        }
+        whoClicked.openInventory(child.getInventory());
+    }
+
+    public static void onUiBack(HumanEntity player){
+        Stack<BaseUi> stack = windowStack.computeIfAbsent(player, humanEntity -> new Stack<>());
+        if (stack.empty()){
+            return;
+        }
+        BaseUi pop = stack.pop();
+        Inventory inventory = pop.getInventory();
+        trackedInventory.put(inventory, pop);
+        pop.onReopen();
+        Utils.newChain().delay(1)
+                .sync(() ->{
+                    player.openInventory(inventory);
+                }).execute();
     }
 }

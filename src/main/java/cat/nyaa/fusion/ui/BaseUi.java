@@ -8,7 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,7 +15,7 @@ import java.util.*;
 
 import static cat.nyaa.fusion.util.Utils.getGuiSection;
 
-public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, MatrixAccess, InteractiveUi, InventoryHolder {
+public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, MatrixAccess, InteractiveUi {
     protected final MatrixCoordinate matrixCoordinate;
     protected final Inventory inventory;
     protected final UiCoordinate resultSlot;
@@ -133,7 +132,7 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
         if (!(event instanceof InventoryClickEvent)){
             return;
         }
-        button.doAction(this);
+        button.doAction(event, this);
     }
 
     @Override
@@ -170,8 +169,9 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
 
     @Override
     public void setButtonAt(int index, GUIButton button) {
+        button = button.clone();
         buttons.put(index, button);
-        ItemStack model = button.getModel();
+        ItemStack model = button.getModel(this);
         Utils.markSample(model);
         inventory.setItem(index, model);
     }
@@ -199,4 +199,8 @@ public abstract class BaseUi implements IQueryUiAccess, IRecipeGUIAccess, Matrix
         return inventory;
     }
 
+    @Override
+    public void onReopen() {
+
+    }
 }

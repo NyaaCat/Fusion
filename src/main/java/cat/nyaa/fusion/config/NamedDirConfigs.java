@@ -49,7 +49,7 @@ public class NamedDirConfigs<T extends NamedFileConfig> implements ISerializable
     private void removeFromDir(T removed) {
         if (removed == null)return;
         if (storageDir.exists()) {
-            File cfgFile = new File(removed.getPlugin().getDataFolder(), removed.getFileName());
+            File cfgFile = removed.getFile();
             if (cfgFile.exists()){
                 if (!cfgFile.delete()) {
                     Bukkit.getLogger().log(Level.SEVERE, "can't remove file "+cfgFile.getPath());

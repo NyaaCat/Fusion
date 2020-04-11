@@ -1,7 +1,7 @@
 package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
-import cat.nyaa.fusion.ui.BaseUi;
+import cat.nyaa.fusion.ui.InfoUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
 import cat.nyaa.fusion.ui.buttons.ButtonRegister;
 import cat.nyaa.fusion.util.Utils;
@@ -13,8 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class DetailRecipeAccess extends BaseUi {
+public class DetailRecipeAccess extends InfoUi {
     private IRecipe recipe;
+    private ItemStack queryItem = null;
 
     public DetailRecipeAccess(List<Integer> sectionIndexes, Inventory inventory, List<IRecipe> recipes, int recipeIndex){
         super(sectionIndexes, inventory);
@@ -47,6 +48,7 @@ public class DetailRecipeAccess extends BaseUi {
         ButtonRegister instance = ButtonRegister.getInstance();
         setButtonAt(26, instance.NEXT_PAGE);
         setButtonAt(18, instance.PREVIOUS_PAGE);
+        setButtonAt(8, instance.BACK);
     }
 
     @Override
@@ -92,6 +94,22 @@ public class DetailRecipeAccess extends BaseUi {
         List<ItemStack> rawRecipe = recipe.getRawRecipe();
         setContent(rawRecipe);
         setResultItem(recipe.getResultItem());
+        super.refreshUi();
+    }
+
+    @Override
+    public boolean hasQuery() {
+        return queryItem != null;
+    }
+
+    @Override
+    public void setQueryItem(ItemStack itemStack){
+        queryItem = itemStack;
+    }
+
+    @Override
+    public ItemStack getQueryItem() {
+        return queryItem;
     }
 
     @Override

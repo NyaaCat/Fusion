@@ -104,4 +104,8 @@ public class Utils {
         ItemMeta itemMeta = currentItem.getItemMeta();
         return itemMeta != null && itemMeta.getPersistentDataContainer().has(NAMESPACED_KEY_MODEL, PersistentDataType.INTEGER);
     }
+
+    public static String colored(String s) {
+        return ChatColor.translateAlternateColorCodes('&', s);
+    }
 }

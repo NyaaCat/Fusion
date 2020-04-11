@@ -2,6 +2,7 @@ package cat.nyaa.fusion.inst;
 
 import cat.nyaa.fusion.FusionPlugin;
 import cat.nyaa.fusion.config.NamedDirConfigs;
+import cat.nyaa.fusion.config.QueryMode;
 import cat.nyaa.fusion.config.element.IElement;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.element.VanillaElement;
@@ -34,14 +35,14 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
     private Map<String, IRecipe> recipeById;
     private Map<Integer, List<IRecipe>> recipeByElementCount;
 
-
     private static Set<Pair<Integer, IElementHandler>> handlerRegistry = new TreeSet<>(Collections.reverseOrder(Map.Entry.comparingByKey()));
 
     private RecipeManager(File storageDir, Class<BaseRecipe> targetClass) {
         super(storageDir, targetClass);
 
-        recipeById = new LinkedHashMap<>();
-        recipeByElementCount = new LinkedHashMap<>();
+        recipeById = new TreeMap<>();
+        recipeByElementCount = new HashMap<>();
+        handlerRegistry.clear();
         registerElements("cat.nyaa.fusion.inst.element");
     }
 
@@ -138,13 +139,27 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
         });
     }
 
-    public static void createQuery(IElement element, Consumer<List<IRecipe>> consumer) {
+    public static void createQuery(IElement element, Consumer<List<IRecipe>> consumer, QueryMode queryMode) {
         Utils.newChain().async((ignored) ->{
+            ItemStack clone = element.getItemStack().clone();
+            clone.setAmount(clone.getMaxStackSize());
             List<IRecipe> recipes = new ArrayList<>();
             getInstance().recipeById.forEach((s, iRecipe) -> {
-                if (iRecipe.getRawRecipe().stream()
-                        .anyMatch(itemStack -> RecipeManager.getItem(itemStack).match(element.getItemStack()))
-                        || RecipeManager.getItem(iRecipe.getResultItem()).match(element.getItemStack())){
+                boolean shouldAdd = false;
+                switch (queryMode){
+                    case MATERIAL:
+                        shouldAdd = iRecipe.getRawRecipe().stream()
+                                .anyMatch(itemStack -> RecipeManager.getItem(itemStack).match(clone));
+                        break;
+                    case RESULT:
+                        shouldAdd = RecipeManager.getItem(iRecipe.getResultItem()).match(clone);
+                        break;
+                    case ALL:
+                        shouldAdd = iRecipe.getRawRecipe().stream()
+                                .anyMatch(itemStack -> RecipeManager.getItem(itemStack).match(clone))
+                                || RecipeManager.getItem(iRecipe.getResultItem()).match(clone);
+                }
+                if (shouldAdd){
                     recipes.add(iRecipe);
                 }
             });

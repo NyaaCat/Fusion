@@ -1,6 +1,8 @@
 package cat.nyaa.fusion.ui.buttons;
 
 import cat.nyaa.fusion.FusionPlugin;
+import cat.nyaa.fusion.ui.buttons.impl.ButtonBack;
+import cat.nyaa.fusion.ui.buttons.impl.ButtonInfo;
 import cat.nyaa.fusion.ui.buttons.impl.ButtonNextPage;
 import cat.nyaa.fusion.ui.buttons.impl.ButtonPreviousPage;
 import cat.nyaa.nyaacore.configuration.FileConfigure;
@@ -10,10 +12,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ButtonRegister extends FileConfigure implements ISerializable {
     private static ButtonRegister INSTANCE;
     @Serializable
-    public GUIButton NEXT_PAGE = new ButtonNextPage();
+    public ButtonNextPage NEXT_PAGE = new ButtonNextPage();
 
     @Serializable
-    public GUIButton PREVIOUS_PAGE = new ButtonPreviousPage();
+    public ButtonPreviousPage PREVIOUS_PAGE = new ButtonPreviousPage();
+
+    @Serializable
+    public ButtonInfo INFO = new ButtonInfo();
+
+    @Serializable
+    public ButtonBack BACK = new ButtonBack();
+
+
 
     private ButtonRegister(){}
 

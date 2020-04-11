@@ -2,12 +2,13 @@ package cat.nyaa.fusion.ui.impl;
 
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
-import cat.nyaa.fusion.ui.BaseUi;
+import cat.nyaa.fusion.ui.InfoUi;
 import cat.nyaa.fusion.ui.MatrixCoordinate;
 import cat.nyaa.fusion.ui.UiCoordinate;
 import cat.nyaa.fusion.ui.UiManager;
 import cat.nyaa.fusion.ui.buttons.ButtonRegister;
 import cat.nyaa.fusion.util.Utils;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListRecipeAccess extends BaseUi {
+public class ListRecipeAccess extends InfoUi {
     private final int rows = 3;
     private final int cols = 5;
 
@@ -83,6 +84,7 @@ public class ListRecipeAccess extends BaseUi {
         ItemStack item = inventory.getItem(9);
         if (item != null){
             Utils.returnItems(event.getPlayer(), Collections.singletonList(item));
+            inventory.setItem(9, new ItemStack(Material.AIR));
         }
     }
 
@@ -95,6 +97,22 @@ public class ListRecipeAccess extends BaseUi {
                 .map(IRecipe::getResultItem)
                 .collect(Collectors.toList());
         setContent(collect);
+        super.refreshUi();
+    }
+
+    @Override
+    public boolean hasQuery() {
+        ItemStack item = inventory.getItem(9);
+        return !(item == null || item.getType().isAir());
+    }
+
+    @Override
+    public ItemStack getQueryItem() {
+        return inventory.getItem(9);
+    }
+
+    @Override
+    public void setQueryItem(ItemStack itemStack) {
     }
 
     @Override
@@ -110,17 +128,7 @@ public class ListRecipeAccess extends BaseUi {
             if (rawSlot == 9){
                 event.setCancelled(false);
                 Utils.newChain().delay(1).sync(()->{
-                    ItemStack item = inventory.getItem(rawSlot);
-                    if (item == null || item.getType().isAir()){
-                        this.recipes = RecipeManager.getInstance().getRecipes();
-                        refreshUi();
-                        return;
-                    }
-                    RecipeManager.createQuery(RecipeManager.getItem(item.clone()), recipes1 -> {
-                        this.recipes = recipes1;
-                        page = 0;
-                        refreshUi();
-                    });
+                    refreshQuery();
                 }).execute();
                 return;
             }
@@ -128,19 +136,21 @@ public class ListRecipeAccess extends BaseUi {
             if (i == -1){
                 return;
             }
+            int index = getPageSize() * getCurrentPage() + i;
             IRecipe iRecipe = recipes.stream()
-                    .skip(getPageSize() * getCurrentPage())
-                    .skip(i)
+                    .skip(index)
                     .findFirst().orElse(null);
             if (iRecipe == null){
                 return;
             }
             HumanEntity whoClicked = event.getWhoClicked();
 
-            DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess((Player) whoClicked, iRecipe);
+            DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess((Player) whoClicked, recipes, index);
+            detailRecipeAccess.setQueryItem(getQueryItem());
+            detailRecipeAccess.refreshUi();
             whoClicked.closeInventory();
             Utils.newChain().sync(()->{
-                whoClicked.openInventory(detailRecipeAccess.getInventory());
+                UiManager.openUiFor(whoClicked, detailRecipeAccess, this);
             }).execute();
         }
     }
@@ -153,5 +163,24 @@ public class ListRecipeAccess extends BaseUi {
     @Override
     public boolean isResultClicked(int rawSlot) {
         return false;
+    }
+
+    public void refreshQuery() {
+        ItemStack item = getQueryItem();
+        if (!hasQuery()){
+            this.recipes = RecipeManager.getInstance().getRecipes();
+            refreshUi();
+            return;
+        }
+        RecipeManager.createQuery(RecipeManager.getItem(item.clone()), recipes1 -> {
+            this.recipes = recipes1;
+            page = 0;
+            refreshUi();
+        }, getQueryMode());
+    }
+
+    @Override
+    public void onReopen() {
+        refreshQuery();
     }
 }
