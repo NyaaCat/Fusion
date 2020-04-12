@@ -1,5 +1,6 @@
 package cat.nyaa.fusion.ui.buttons.impl;
 
+import cat.nyaa.fusion.config.QueryMode;
 import cat.nyaa.fusion.ui.IQueryUiAccess;
 import cat.nyaa.fusion.ui.InfoUi;
 import cat.nyaa.fusion.ui.buttons.GUIButton;
@@ -35,7 +36,10 @@ public class ButtonInfo extends GUIButton {
     List<String> loreQueryResult = new ArrayList<>();
 
     @Serializable
-    List<String> loreDetail = new ArrayList<>();
+    List<String> loreDetailMaterial = new ArrayList<>();
+
+    @Serializable
+    List<String> loreDetailResult = new ArrayList<>();
 
     {
         default_.add(colored("&ePlace an item to query recipes"));
@@ -46,7 +50,8 @@ public class ButtonInfo extends GUIButton {
         loreQueryResult.add(colored("&cDisplaying usage of &r{itemName}&c By Result, total {totalPage}"));
         loreQueryResult.add(colored("&aClick to change query mode to Material"));
         loreQueryResult.add(colored("&ePlace an item to query recipes."));
-        loreDetail.add(colored("&cDisplaying usage of &r{itemName}&c By Result, {currentPage} / {totalPage}"));
+        loreDetailMaterial.add(colored("&cDisplaying usage of &r{itemName}&c By Material, {currentPage} / {totalPage}"));
+        loreDetailResult.add(colored("&cDisplaying usage of &r{itemName}&c By Result, {currentPage} / {totalPage}"));
     }
 
     @Override
@@ -92,7 +97,17 @@ public class ButtonInfo extends GUIButton {
         }else if (iQueryUiAccess instanceof DetailRecipeAccess){
             DetailRecipeAccess detailRecipeAccess = (DetailRecipeAccess) iQueryUiAccess;
             if (detailRecipeAccess.hasQuery()){
-                itemMeta.setLore(getLore(loreDetail, detailRecipeAccess));
+                QueryMode queryMode = detailRecipeAccess.getQueryMode();
+                switch (queryMode) {
+                    case MATERIAL:
+                        itemMeta.setLore(getLore(loreDetailMaterial, detailRecipeAccess));
+                        break;
+                    case RESULT:
+                        itemMeta.setLore(getLore(loreDetailResult, detailRecipeAccess));
+                        break;
+                    default:
+                        itemMeta.setLore(getLore(default_, detailRecipeAccess));
+                }
             }
             else itemMeta.setLore(getLore(default_, detailRecipeAccess));
         }else {

@@ -11,6 +11,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class Utils {
             enchants.forEach((enchantment, integer) -> {
                 fakeMeta.addEnchant(enchantment, integer, true);
             });
+        }
+        if (itemMeta instanceof LeatherArmorMeta && fakeMeta instanceof LeatherArmorMeta){
+            ((LeatherArmorMeta) fakeMeta).setColor(((LeatherArmorMeta) itemMeta).getColor());
         }
         markSample(fakeMeta);
         fakeItem.setItemMeta(fakeMeta);

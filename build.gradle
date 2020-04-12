@@ -26,6 +26,6 @@ repositories {
 
 dependencies {
     api "org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT"
-    api "cat.nyaa:nyaacore:7.1-SNAPSHOT"
+    api "cat.nyaa:nyaacore:7.2-SNAPSHOT"
     api "cat.nyaa:rpgitems:3.8-SNAPSHOT"
 }

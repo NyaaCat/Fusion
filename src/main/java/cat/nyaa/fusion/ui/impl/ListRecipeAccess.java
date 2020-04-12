@@ -147,6 +147,7 @@ public class ListRecipeAccess extends InfoUi {
 
             DetailRecipeAccess detailRecipeAccess = UiManager.newDetailRecipeAccess((Player) whoClicked, recipes, index);
             detailRecipeAccess.setQueryItem(getQueryItem());
+            detailRecipeAccess.setQueryMode(getQueryMode());
             detailRecipeAccess.refreshUi();
             whoClicked.closeInventory();
             Utils.newChain().sync(()->{
