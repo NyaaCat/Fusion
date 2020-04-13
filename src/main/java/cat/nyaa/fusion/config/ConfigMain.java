@@ -24,6 +24,9 @@ public class ConfigMain extends PluginConfigure {
     @Serializable(name = "gui.shortcut.enabled_world")
     public List<String> enabledWorld = new ArrayList<>();
 
+    @Serializable
+    public ListMode listMode = ListMode.ALL;
+
     @Override
     protected JavaPlugin getPlugin() {
         return FusionPlugin.plugin;

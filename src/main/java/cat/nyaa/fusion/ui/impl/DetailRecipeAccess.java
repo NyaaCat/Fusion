@@ -6,9 +6,11 @@ import cat.nyaa.fusion.ui.MatrixCoordinate;
 import cat.nyaa.fusion.ui.buttons.ButtonRegister;
 import cat.nyaa.fusion.util.Utils;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -126,6 +128,45 @@ public class DetailRecipeAccess extends InfoUi {
     @Override
     public void onContentInteract(InventoryInteractEvent event) {
         event.setCancelled(true);
+        if (!event.getWhoClicked().isOp()){
+            return;
+        }
+        if (event instanceof InventoryClickEvent){
+            boolean isClone = ((InventoryClickEvent) event).getClick().isCreativeAction();
+            boolean isRightClick = ((InventoryClickEvent) event).getClick().isRightClick();
+            boolean valid = isClone || isRightClick;
+            if (valid){
+                ItemStack cursor = ((InventoryClickEvent) event).getCursor();
+                int index = validClicks.indexOf(((InventoryClickEvent) event).getSlot());
+                ItemStack itemAt = recipes.get(getCurrentPage()).getRawRecipe().get(index);
+                if (itemAt == null || itemAt.getType().isAir()){
+                    return;
+                }
+                if (cursor == null || cursor.getType().isAir() || cursor.isSimilar(itemAt)) {
+                    if (recipes.size() < getCurrentPage()) {
+                        return;
+                    }
+
+                    Utils.newChain().delay(1)
+                            .sync(() -> {
+                                InventoryView view = event.getView();
+                                ItemStack cursor1 = view.getCursor();
+                                boolean similar = false;
+                                if (cursor1 == null || cursor1.getType().isAir() || (similar = cursor1.isSimilar(itemAt))) {
+                                    ItemStack clone = itemAt.clone();
+                                    if (similar){
+                                        clone.setAmount(Math.min(cursor1.getMaxStackSize(), cursor1.getAmount()+1));
+                                    }else {
+                                        if (isClone){
+                                            clone.setAmount(clone.getMaxStackSize());
+                                        }
+                                    }
+                                    view.setCursor(clone);
+                                }
+                            }).execute();
+                }
+            }
+        }
     }
 
     @Override

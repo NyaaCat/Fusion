@@ -1,5 +1,7 @@
 package cat.nyaa.fusion.ui.impl;
 
+import cat.nyaa.fusion.FusionPlugin;
+import cat.nyaa.fusion.config.ListMode;
 import cat.nyaa.fusion.config.recipe.IRecipe;
 import cat.nyaa.fusion.inst.RecipeManager;
 import cat.nyaa.fusion.ui.InfoUi;
@@ -17,6 +19,7 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -169,7 +172,7 @@ public class ListRecipeAccess extends InfoUi {
     public void refreshQuery() {
         ItemStack item = getQueryItem();
         if (!hasQuery()){
-            this.recipes = RecipeManager.getInstance().getRecipes();
+            this.recipes = getDefaultRecipes();
             refreshUi();
             return;
         }
@@ -178,6 +181,20 @@ public class ListRecipeAccess extends InfoUi {
             page = 0;
             refreshUi();
         }, getQueryMode());
+    }
+
+    public static List<IRecipe> getDefaultRecipes() {
+        ListMode listMode = FusionPlugin.plugin.getMainConfig().listMode;
+        List<IRecipe> recipes = new ArrayList<>();
+        switch (listMode){
+            case NONE:
+                break;
+            case ALL:
+            default:
+                recipes = RecipeManager.getInstance().getRecipes();
+            break;
+        }
+        return recipes;
     }
 
     @Override

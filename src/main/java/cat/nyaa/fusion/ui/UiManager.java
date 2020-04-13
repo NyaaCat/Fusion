@@ -52,14 +52,31 @@ public class UiManager {
             if (trackedInventory.containsKey(clickedInventory)){
                 event.setCancelled(true);
                 BaseUi baseUi = trackedInventory.get(clickedInventory);
-                if (event.getClickedInventory()!= clickedInventory){
-                    InventoryAction action = event.getAction();
+                if (!isValidMouseAction(event, clickedInventory)){
+                    return;
+                }
+                int rawSlot = ((InventoryClickEvent) event).getRawSlot();
+                event.setCancelled(false);
+                if (baseUi.isContentClicked(rawSlot)){
+                    baseUi.onContentInteract(event);
+                }else if (baseUi.isResultClicked(rawSlot)){
+                    baseUi.onResultInteract(event, clickedInventory.getItem(rawSlot));
+                }else if (baseUi.isButtonClicked(event.getRawSlot())){
+                    baseUi.onButtonClicked(event, baseUi.getButtonAt(event.getRawSlot()));
+                }else {
+                    event.setCancelled(true);
+                }
+            }
+        }
 
-                    event.setCancelled(false);
-                    if (action.equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                        ItemStack currentItem = event.getCurrentItem();
-                        event.setCancelled(true);
-                        //disabled due to some issues.
+        protected boolean isValidMouseAction(InventoryClickEvent event, Inventory clickedInventory) {
+            if (event.getClickedInventory()!= clickedInventory){
+                InventoryAction action = event.getAction();
+
+                if (action.equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                    ItemStack currentItem = event.getCurrentItem();
+                    return false;
+                    //disabled due to some issues.
 
 //                        new BukkitRunnable(){
 //                            @Override
@@ -81,26 +98,13 @@ public class UiManager {
 //                                }
 //                            }
 //                        }.runTaskLater(FusionPlugin.plugin, 1);
-                    }
-                    return;
                 }
-                int rawSlot = ((InventoryClickEvent) event).getRawSlot();
-                boolean validClick = baseUi.isContentClicked(rawSlot);
                 event.setCancelled(false);
-                if (validClick){
-                    baseUi.onContentInteract(event);
-                }else if (baseUi.isResultClicked(rawSlot)){
-                    baseUi.onResultInteract(event, clickedInventory.getItem(rawSlot));
-                }else if (baseUi.isButtonClicked(event.getRawSlot())){
-                    baseUi.onButtonClicked(event, baseUi.getButtonAt(event.getRawSlot()));
-                }else {
-                    event.setCancelled(true);
-                }
-                //todo catch events and pass to next level.
-                return;
-
+                return false;
             }
+            return true;
         }
+
         @EventHandler
         public void onSampleItemClick(InventoryClickEvent event){
             ItemStack currentItem = event.getCurrentItem();
@@ -193,7 +197,7 @@ public class UiManager {
 
     public static ListRecipeAccess newListRecipeAccess(Player player){
         Inventory fusion = Bukkit.createInventory(player, InventoryType.CHEST, "Fusion");
-        List<IRecipe> recipes = RecipeManager.getInstance().getRecipes();
+        List<IRecipe> recipes = ListRecipeAccess.getDefaultRecipes();
         ListRecipeAccess listRecipeAccess = new ListRecipeAccess(Utils.getGuiSection(0, 2, 3, 5), fusion, recipes);
         listRecipeAccess.refreshUi();
         trackedInventory.put(fusion, listRecipeAccess);

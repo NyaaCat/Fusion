@@ -30,6 +30,10 @@ public class FusionPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(events, this);
     }
 
+    public ConfigMain getMainConfig(){
+        return configMain;
+    }
+
     @Override
     public void onDisable() {
         super.onDisable();
