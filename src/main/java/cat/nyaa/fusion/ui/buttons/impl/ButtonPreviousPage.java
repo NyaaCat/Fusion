@@ -40,6 +40,10 @@ public class ButtonPreviousPage extends GUIButton {
         if (currentPage == 0){
             nextPage = totalPages - 1;
         }
+        
+        if (nextPage < 0 || nextPage >= totalPages){
+            nextPage = 0;
+        }
 
         iQueryUiAccess.setPage(nextPage);
         iQueryUiAccess.refreshUi();

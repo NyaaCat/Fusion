@@ -15,7 +15,7 @@ public abstract class GUIButton implements ISerializable, Cloneable{
     protected int getTotalPages(IQueryUiAccess iQueryUiAccess){
         int size = iQueryUiAccess.getSize();
         int pageSize = iQueryUiAccess.getPageSize();
-        int totalPages = (int) Math.ceil((double)size/(double) Math.max(pageSize, 0));
+        int totalPages = (int) Math.ceil((double)size/(double) Math.max(pageSize, 0.1));
         return totalPages;
     }
 
