@@ -83,6 +83,12 @@ public class CraftingTableAccess extends BaseUi {
 
     @Override
     public void onContentInteract(InventoryInteractEvent event) {
+        if (event instanceof InventoryClickEvent){
+            if (!validClicks.contains(((InventoryClickEvent) event).getRawSlot())){
+                event.setCancelled(true);
+                return;
+            }
+        }
         event.setCancelled(false);
         checkAndRefreshRecipe();
     }
