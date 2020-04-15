@@ -128,50 +128,68 @@ public class DetailRecipeAccess extends InfoUi {
     @Override
     public void onContentInteract(InventoryInteractEvent event) {
         event.setCancelled(true);
+
+        if (event instanceof InventoryClickEvent){
+            checkClone(event);
+        }
+    }
+
+    private void checkClone(InventoryInteractEvent event) {
         if (!event.getWhoClicked().isOp()){
             return;
         }
-        if (event instanceof InventoryClickEvent){
-            boolean isClone = ((InventoryClickEvent) event).getClick().isCreativeAction();
-            boolean isRightClick = ((InventoryClickEvent) event).getClick().isRightClick();
-            boolean valid = isClone || isRightClick;
-            if (valid){
-                ItemStack cursor = ((InventoryClickEvent) event).getCursor();
-                int index = validClicks.indexOf(((InventoryClickEvent) event).getSlot());
-                ItemStack itemAt = recipes.get(getCurrentPage()).getRawRecipe().get(index);
-                if (itemAt == null || itemAt.getType().isAir()){
+        boolean isClone = ((InventoryClickEvent) event).getClick().isCreativeAction();
+        boolean isRightClick = ((InventoryClickEvent) event).getClick().isRightClick();
+        boolean valid = isClone || isRightClick;
+        if (valid){
+            ItemStack cursor = ((InventoryClickEvent) event).getCursor();
+            int index = validClicks.indexOf(((InventoryClickEvent) event).getSlot());
+            ItemStack itemAt = null;
+            if (index != -1){
+                itemAt = recipes.get(getCurrentPage()).getRawRecipe().get(index);
+            }else {
+                if (((InventoryClickEvent) event).getSlot() == resultSlot.access(matrixCoordinate)) {
+                    itemAt = recipe.getResultItem();
+                }
+            }
+            if (itemAt == null || itemAt.getType().isAir()){
+                return;
+            }
+            if (cursor == null || cursor.getType().isAir() || cursor.isSimilar(itemAt)) {
+                if (recipes.size() < getCurrentPage()) {
                     return;
                 }
-                if (cursor == null || cursor.getType().isAir() || cursor.isSimilar(itemAt)) {
-                    if (recipes.size() < getCurrentPage()) {
-                        return;
-                    }
 
-                    Utils.newChain().delay(1)
-                            .sync(() -> {
-                                InventoryView view = event.getView();
-                                ItemStack cursor1 = view.getCursor();
-                                boolean similar = false;
-                                if (cursor1 == null || cursor1.getType().isAir() || (similar = cursor1.isSimilar(itemAt))) {
-                                    ItemStack clone = itemAt.clone();
-                                    if (similar){
-                                        clone.setAmount(Math.min(cursor1.getMaxStackSize(), cursor1.getAmount()+1));
-                                    }else {
-                                        if (isClone){
-                                            clone.setAmount(clone.getMaxStackSize());
-                                        }
+                ItemStack finalItemAt = itemAt;
+                Utils.newChain().delay(1)
+                        .sync(() -> {
+                            InventoryView view = event.getView();
+                            ItemStack cursor1 = view.getCursor();
+                            boolean similar = false;
+                            if (cursor1 == null || cursor1.getType().isAir() || (similar = cursor1.isSimilar(finalItemAt))) {
+                                ItemStack clone = finalItemAt.clone();
+                                if (similar){
+                                    clone.setAmount(Math.min(cursor1.getMaxStackSize(), cursor1.getAmount()+1));
+                                }else {
+                                    if (isClone){
+                                        clone.setAmount(clone.getMaxStackSize());
                                     }
-                                    view.setCursor(clone);
                                 }
-                            }).execute();
-                }
+                                view.setCursor(clone);
+                            }
+                        }).execute();
             }
         }
     }
 
+
     @Override
     public void onResultInteract(InventoryInteractEvent event, ItemStack itemStack) {
         event.setCancelled(true);
+
+        if (event instanceof InventoryClickEvent){
+            checkClone(event);
+        }
     }
 
     @Override
