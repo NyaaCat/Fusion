@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-ext.minecraftVersion = "1.15.2"
+ext.minecraftVersion = "1.16.1"
 
 String majorVersion = 1
 String minorVersion = 0
