@@ -5,7 +5,7 @@ plugins {
 ext.minecraftVersion = "1.16.1"
 
 String majorVersion = 1
-String minorVersion = 0
+String minorVersion = 1
 
 String buildNumber = System.getenv("BUILD_NUMBER") == null ? "0"             : System.getenv("BUILD_NUMBER")
 
@@ -26,6 +26,6 @@ repositories {
 
 dependencies {
     api "org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT"
-    api "cat.nyaa:nyaacore:7.2-SNAPSHOT"
+    api "cat.nyaa:nyaacore:8.0-SNAPSHOT"
     api "cat.nyaa:rpgitems:3.8-SNAPSHOT"
 }
