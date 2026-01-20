@@ -236,6 +236,10 @@ public class RecipeManager extends NamedDirConfigs<BaseRecipe> {
     public void loadFromDir() {
         super.loadFromDir();
         updateFromConfig();
+        boolean needsSave = values().stream().anyMatch(BaseRecipe::isNbtUpdated);
+        if (needsSave) {
+            saveToDir();
+        }
     }
 
     public List<IRecipe> getRecipes() {

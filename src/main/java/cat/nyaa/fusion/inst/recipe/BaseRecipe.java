@@ -29,6 +29,7 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
 
     protected List<IElement> recipies = new ArrayList<>();
     protected ItemStack resultItem;
+    private boolean nbtUpdated = false;
 
     public BaseRecipe(String name) {
         super(name);
@@ -109,6 +110,22 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
         if (!resultItemNbt.equals("")){
             resultItem = RecipeManager.getItem(resultItemNbt).getItemStack();
         }
+        boolean updated = false;
+        List<String> refreshedRecipies = recipies.stream()
+                .map(element -> element.getElementHandler().serialize())
+                .collect(Collectors.toList());
+        if (!refreshedRecipies.equals(recipiesNbt)) {
+            recipiesNbt = refreshedRecipies;
+            updated = true;
+        }
+        if (resultItem != null) {
+            String refreshedResult = RecipeManager.getItem(resultItem).getElementHandler().serialize();
+            if (!refreshedResult.equals(resultItemNbt)) {
+                resultItemNbt = refreshedResult;
+                updated = true;
+            }
+        }
+        nbtUpdated = updated;
     }
 
     @Override
@@ -123,5 +140,9 @@ public class BaseRecipe extends NamedFileConfig implements IRecipe {
     public void setResult(IElement item) {
         resultItemNbt = item.getElementHandler().serialize();
         resultItem = item.getItemStack();
+    }
+
+    public boolean isNbtUpdated() {
+        return nbtUpdated;
     }
 }
