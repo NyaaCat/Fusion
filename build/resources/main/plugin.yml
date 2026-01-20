@@ -1,0 +1,29 @@
+name: Fusion
+main: cat.nyaa.fusion.FusionPlugin
+description: "FusionPlugin"
+version: 1.0 beta
+depend: [NyaaCore,LangUtils]
+softdepend: [RPGItems]
+authors: [ReinWD]
+website: "https://github.com/NyaaCat/Fusion"
+database: false
+api-version: 1.13
+
+commands:
+  fusion:
+    aliases: fus
+    description: 'fusion plugin admin command'
+    permission: fusion.command
+    permission-message: "You do not have the required permission: <permission>"
+    usage: "/<command> [SubCommand...] [Arguments...] or /<command> help"
+
+permissions:
+  fusion.admin:
+    default: op
+    description: 'admin permission for fusion plugin'
+  fusion.user:
+    default: true
+    description: 'user permission for fusion plugin'
+  fusion.command:
+    default: true
+    description: 'user permission for fusion plugin'
