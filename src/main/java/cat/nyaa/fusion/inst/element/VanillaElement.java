@@ -48,11 +48,23 @@ public class VanillaElement extends BaseElement {
             nbt = "";
             this.itemStack = new ItemStack(Material.AIR);
             itemMatcher.itemTemplate = this.itemStack;
+            configureMatcher();
             return;
         }
         nbt = ItemStackUtils.itemToBase64(itemStack);
         this.itemStack = itemStack.clone();
         itemMatcher.itemTemplate = this.itemStack;
+        configureMatcher();
+    }
+
+    private void configureMatcher() {
+        itemMatcher.requireExact = false;
+        itemMatcher.minDamageValue = -1;
+        itemMatcher.maxDamageValue = -1;
+        itemMatcher.enchantMatch = BasicItemMatcher.MatchingMode.ARBITRARY;
+        itemMatcher.nameMatch = BasicItemMatcher.MatchingMode.EXACT_TEXT;
+        itemMatcher.loreMatch = BasicItemMatcher.MatchingMode.EXACT_TEXT;
+        itemMatcher.repairCostMatch = BasicItemMatcher.MatchingMode.ARBITRARY;
     }
 
     @Override
