@@ -5,7 +5,7 @@ plugins {
 ext.minecraftVersion = "1.21.11"
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 String majorVersion = 1

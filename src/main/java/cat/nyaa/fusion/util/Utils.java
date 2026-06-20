@@ -53,6 +53,12 @@ public class Utils {
         if (itemMeta.hasCustomModelData()){
             fakeMeta.setCustomModelData(itemMeta.getCustomModelData());
         }
+        if (itemMeta.hasCustomModelDataComponent()) {
+            fakeMeta.setCustomModelDataComponent(itemMeta.getCustomModelDataComponent());
+        }
+        if (itemMeta.hasItemModel()) {
+            fakeMeta.setItemModel(itemMeta.getItemModel());
+        }
         Map<Enchantment, Integer> enchants = itemMeta.getEnchants();
         if (!enchants.isEmpty()) {
             enchants.forEach((enchantment, integer) -> {
